@@ -1,6 +1,6 @@
 import type { AbilityDef, CardInstance, GameState, PlayerId, Position } from './types.ts';
 import { TRIGGERS } from './types.ts';
-import { placeOnGrid, removeFromGrid, isEmpty, key } from './board.ts';
+import { placeOnGrid, removeFromGrid, isEmpty, inBounds, key } from './board.ts';
 import { getEffect, getTarget } from './registries.ts';
 import type { TriggerData } from './registries.ts';
 import { instantiate, opponent } from './factory.ts';
@@ -39,6 +39,9 @@ export interface EffectAPI {
   discardRandomFromHand(owner: PlayerId): void;
   draw(owner: PlayerId, count: number): void;
   swap(uidA: number, uidB: number): void;
+  move(uid: number, pos: Position): void;
+  bounce(uid: number): void;
+  silence(uid: number): void;
   rngInt(n: number): number;
   log(code: string, params?: Record<string, string | number>): void;
 }
@@ -253,6 +256,36 @@ export class EffectRunner {
         placeOnGrid(state, uidA, pb);
         placeOnGrid(state, uidB, pa);
         pushLog(state, 'swap', { src: a.defId, tgt: b.defId });
+      },
+      move(uid, pos) {
+        const c = state.cards.get(uid);
+        if (!c?.pos || !inBounds(state, pos) || !isEmpty(state, pos)) return;
+        removeFromGrid(state, c.pos);
+        placeOnGrid(state, uid, pos);
+      },
+      bounce(uid) {
+        const c = state.cards.get(uid);
+        if (!c || c.zone !== 'board' || c.isQueen) return;
+        if (c.pos) removeFromGrid(state, c.pos);
+        c.pos = null;
+        c.zone = 'hand';
+        c.hp = c.maxHp;
+        c.shield = 0;
+        c.hasAttacked = false;
+        c.justPlayed = false;
+        c.activeUsed = false;
+        const p = state.players[c.owner];
+        if (p.hand.length < p.handLimit) p.hand.push(uid);
+        else c.zone = 'dead';
+        pushLog(state, 'bounce', { card: c.defId });
+      },
+      silence(uid) {
+        const c = state.cards.get(uid);
+        if (!c || c.zone === 'dead' || c.isQueen) return;
+        c.abilities = [];
+        c.keywords = [];
+        c.counters = {};
+        pushLog(state, 'silence', { card: c.defId });
       },
       rngInt(n) {
         return nextInt(state.rng, n);

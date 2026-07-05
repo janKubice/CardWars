@@ -1,7 +1,7 @@
 // Deterministický test aury a aktivních schopností na úrovni enginu.
 // Spuštění: node --experimental-strip-types scripts/featcheck.ts
 
-import { GameEngine, instantiate, placeOnGrid, recomputeAuras } from '../src/engine/index.ts';
+import { GameEngine, EffectRunner, getEffect, instantiate, placeOnGrid, recomputeAuras } from '../src/engine/index.ts';
 import { LIBRARY } from '../src/content/cards.ts';
 
 declare const process: { exit(code: number): never };
@@ -57,5 +57,34 @@ const foeHp0 = foe.hp;
 e.activate(zap.uid, foe.uid);
 check('cílená aktivace zraní zvolený cíl (−2)', foe.hp === foeHp0 - 2);
 
-console.log(failed === 0 ? '\nOK ✅ aura i aktivace fungují.' : `\nCHYBA: ${failed} kontrol selhalo.`);
+// ── PUSH: odstrčí nepřítele o 1 políčko od zdroje ──
+const shover = instantiate(st, 'shover', 'A', 'board');
+placeOnGrid(st, shover.uid, { row: 5, col: 1 });
+const pushed = instantiate(st, 'recruit', 'B', 'board');
+placeOnGrid(st, pushed.uid, { row: 4, col: 1 }); // vpřed od shovera (A kouká nahoru)
+const runner = new EffectRunner(st);
+const pushEffect = getEffect('push');
+check('efekt push je zaregistrován', pushEffect != null);
+pushEffect?.(runner.makeApi(shover.uid), {}, [pushed], shover.uid, undefined);
+check('push odstrčí cíl dál od zdroje', pushed.pos?.row === 3);
+
+// ── BOUNCE: vrátí nepřítele do jeho ruky ──
+const bouncer = instantiate(st, 'bouncer', 'A', 'board');
+placeOnGrid(st, bouncer.uid, { row: 2, col: 5 });
+const bounced = instantiate(st, 'recruit', 'B', 'board');
+placeOnGrid(st, bounced.uid, { row: 2, col: 6 });
+check('bounce nabízí platný cíl', e.activeTargets(bouncer.uid).includes(bounced.uid));
+e.activate(bouncer.uid, bounced.uid);
+check('bounce vrátí cíl do ruky', bounced.zone === 'hand' && st.players.B.hand.includes(bounced.uid));
+
+// ── SILENCE: odstraní schopnosti cíle ──
+const silencer = instantiate(st, 'silencer', 'A', 'board');
+placeOnGrid(st, silencer.uid, { row: 1, col: 4 });
+const victim = instantiate(st, 'commander', 'B', 'board');
+placeOnGrid(st, victim.uid, { row: 1, col: 5 });
+check('umlčovaný má před silence schopnost', victim.abilities.length > 0);
+e.activate(silencer.uid, victim.uid);
+check('silence odstraní schopnosti', victim.abilities.length === 0);
+
+console.log(failed === 0 ? '\nOK ✅ aura, aktivace, push, bounce i silence fungují.' : `\nCHYBA: ${failed} kontrol selhalo.`);
 if (failed > 0) process.exit(1);

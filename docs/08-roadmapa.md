@@ -44,7 +44,8 @@ Cíl: **jeden hratelný souboj** na desce 7×6, žádná ekonomika, pevný balí
 - [x] Vylepšování karet (Level): v obchodě +1/+1 na druh karty (viz [meta §3](05-meta-progrese.md)).
 - [x] Výběr jazyka CS/EN + kompletní vizuální redesign UI.
 - [x] Pokročilé keywordy **Aura** (trvalý plošný buff, dynamický přepočet) a **Aktivace** (ruční schopnost za energii, i s cílením) + karty Velitel/Standarta/Fanatik/Léčitel/Zaklínač; bot je používá. Test `npm run featcheck`.
-- [ ] Rozšíření poolu ke ~40–50 kartám (další obsah).
+- [x] Nové efekty **push/pull** (odstrčení/přitažení), **bounce** (vrácení do ruky), **silence** (umlčení) a cíl **randomEnemy**; **~37 karet** napříč raritami. Test `npm run featcheck`.
+- [ ] Doladit balanc rozšířeného poolu a doplnit ke ~50 kartám podle potřeby.
 
 **Test úspěchu:** *„Chce se mi dokončit run?"*
 

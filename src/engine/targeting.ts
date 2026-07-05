@@ -5,6 +5,7 @@ import type { Direction } from './directions.ts';
 import { registerTarget } from './registries.ts';
 import type { TriggerData } from './registries.ts';
 import { opponent } from './factory.ts';
+import { nextInt } from './rng.ts';
 
 // Vestavěné cíle (tvary). Přidání nového cíle = jeden registerTarget níže.
 // Každý resolver vrátí seznam zasažených KARET.
@@ -115,6 +116,13 @@ registerTarget('enemyQueen', (state, uid) => {
   const c = src(state, uid);
   if (!c) return [];
   return boardCards(state).filter((x) => x.owner === opponent(c.owner) && x.isQueen);
+});
+
+registerTarget('randomEnemy', (state, uid) => {
+  const c = src(state, uid);
+  if (!c) return [];
+  const foes = boardCards(state).filter((x) => x.owner === opponent(c.owner));
+  return foes.length ? [foes[nextInt(state.rng, foes.length)]] : [];
 });
 
 // Ručně zvolený cíl (aktivní schopnosti). uid(y) přijdou v datech aktivace.

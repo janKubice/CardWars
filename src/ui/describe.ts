@@ -25,6 +25,10 @@ function effectText(a: AbilityDef): string {
     case 'discardRandom': return t('ab.discardRandom');
     case 'draw': return t('ab.draw', { n: n(p, 'value', 'count') });
     case 'summon': return t('ab.summon');
+    case 'push': return t('ab.push');
+    case 'pull': return t('ab.pull');
+    case 'bounce': return t('ab.bounce');
+    case 'silence': return t('ab.silence');
     default: return a.effect;
   }
 }
@@ -41,6 +45,7 @@ function targetText(a: AbilityDef): string {
     case 'allEnemies': return t('tg.allEnemies');
     case 'allAllies': return t('tg.allAllies');
     case 'enemyQueen': return t('tg.enemyQueen');
+    case 'randomEnemy': return t('tg.randomEnemy');
     default: return a.target;
   }
 }

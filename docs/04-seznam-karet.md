@@ -99,6 +99,12 @@ Reprezentativní řez napříč raritami — ne finální 100+, ale dost na to, 
 
 ---
 
+## 3b. Stav implementace
+
+V kódu je zatím **~37 karet** (`src/content/cards.ts`) napříč všemi raritami a keywordy: Vylož, Skon, Úsvit, Zranění, Vyléčení, Zaštítění, Odpočet, Zabití, **Aura**, **Aktivace** (i s ručním cílením). Implementované efekty: damage, heal, shield, buff/debuff, terrain (miny), discard, draw, summon, **push/pull**, **bounce**, **silence**. Cíle: self, neighbor, direction, around, aroundVictim, lowestHpAlly, allEnemies, **randomEnemy**, chosen, enemyQueen.
+
+Přidání další karty je čistě datové (viz [10-architektura](10-architektura.md)) — cesta ke 100+ vede skládáním těchto dílků.
+
 ## 4. Jak set poroste do 100–200
 
 - Držet se **jazyka keywordů** — nové karty = nové kombinace, ne nová jednorázová pravidla.

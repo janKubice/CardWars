@@ -85,6 +85,66 @@ export const CARD_DEFS: CardDef[] = [
     id: 'zapper', name: 'Zaklínač', rarity: 'rare', cost: 4, hp: 3, attack: 1, range: 1,
     abilities: [{ trigger: 'active', effect: 'damage', target: 'chosen', params: { value: 2, side: 'enemy', range: 3, cost: 1 } }],
   },
+
+  // ── Rozšíření poolu (push / bounce / silence / random / summon) ──
+  // Common
+  { id: 'slinger', name: 'Prakovník', rarity: 'common', cost: 1, hp: 1, attack: 1, range: 2 },
+  {
+    id: 'squire', name: 'Panoš', rarity: 'common', cost: 1, hp: 2, attack: 1, range: 1,
+    abilities: [{ trigger: 'deploy', effect: 'shield', target: 'self', params: { value: 1 } }],
+  },
+  { id: 'brute', name: 'Rváč', rarity: 'common', cost: 3, hp: 5, attack: 3, range: 1 },
+  { id: 'scout', name: 'Zvěd', rarity: 'common', cost: 2, hp: 2, attack: 2, range: 1, keywords: ['charge'] },
+
+  // Uncommon
+  {
+    id: 'shover', name: 'Postrkovač', rarity: 'uncommon', cost: 2, hp: 2, attack: 2, range: 1,
+    abilities: [{ trigger: 'deploy', effect: 'push', target: 'neighbor', params: { direction: 'forward', side: 'enemy' } }],
+  },
+  {
+    id: 'sapper', name: 'Zákopník', rarity: 'uncommon', cost: 2, hp: 2, attack: 2, range: 1, tags: ['Explosive'],
+    abilities: [{ trigger: 'death', effect: 'damage', target: 'aroundVictim', params: { value: 2, side: 'any' } }],
+  },
+  {
+    id: 'cleric', name: 'Klerik', rarity: 'uncommon', cost: 3, hp: 3, attack: 1, range: 1,
+    abilities: [{ trigger: 'upkeepStart', effect: 'heal', target: 'lowestHpAlly', params: { value: 1 } }],
+  },
+  {
+    id: 'hexer', name: 'Kletbář', rarity: 'uncommon', cost: 3, hp: 2, attack: 2, range: 1,
+    abilities: [{ trigger: 'deploy', effect: 'buff', target: 'randomEnemy', params: { atk: -1 } }],
+  },
+
+  // Rare
+  { id: 'sniper', name: 'Odstřelovač', rarity: 'rare', cost: 4, hp: 2, attack: 3, range: 4 },
+  {
+    id: 'bouncer', name: 'Vyhazovač', rarity: 'rare', cost: 3, hp: 3, attack: 2, range: 1,
+    abilities: [{ trigger: 'active', effect: 'bounce', target: 'chosen', params: { side: 'enemy', cost: 1 } }],
+  },
+  {
+    id: 'silencer', name: 'Umlčovač', rarity: 'rare', cost: 3, hp: 3, attack: 2, range: 1,
+    abilities: [{ trigger: 'active', effect: 'silence', target: 'chosen', params: { side: 'any', cost: 1 } }],
+  },
+  {
+    id: 'summoner', name: 'Přivolávač', rarity: 'rare', cost: 4, hp: 3, attack: 1, range: 1,
+    abilities: [{ trigger: 'deploy', effect: 'summon', target: 'none', params: { defId: 'recruit' } }],
+  },
+
+  // Epic
+  {
+    id: 'warlord', name: 'Válečník', rarity: 'epic', cost: 6, hp: 6, attack: 3, range: 1,
+    abilities: [{ trigger: 'aura', effect: 'buff', target: 'around', params: { atk: 2, side: 'ally' } }],
+  },
+  {
+    id: 'plague', name: 'Morová vrána', rarity: 'epic', cost: 5, hp: 4, attack: 2, range: 1,
+    abilities: [{ trigger: 'upkeepStart', effect: 'damage', target: 'allEnemies', params: { value: 1 } }],
+  },
+
+  // Legendary
+  {
+    id: 'archmage', name: 'Arcimág', rarity: 'legendary', cost: 7, hp: 5, attack: 2, range: 1,
+    abilities: [{ trigger: 'active', effect: 'damage', target: 'chosen', params: { value: 3, side: 'enemy', range: 5, cost: 2 } }],
+  },
+  { id: 'titan', name: 'Titán', rarity: 'legendary', cost: 8, hp: 10, attack: 6, range: 1, keywords: ['fragile', 'charge'] },
 ];
 
 export const LIBRARY: Record<string, CardDef> = Object.fromEntries(CARD_DEFS.map((d) => [d.id, d]));

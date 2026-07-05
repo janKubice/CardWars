@@ -111,10 +111,11 @@ const cs: Dict = {
   'ab.damage': 'dá {n} dmg', 'ab.heal': 'léčí {n}', 'ab.shield': 'štít {n}', 'ab.buff': '+{atk}/{hp}',
   'ab.destroy': 'zničí', 'ab.terrain': 'rozmístí {t}', 'ab.discardRandom': 'zahodí nepříteli kartu z ruky',
   'ab.draw': 'dober {n}', 'ab.summon': 'přivolá jednotku',
+  'ab.push': 'odstrčí', 'ab.pull': 'přitáhne', 'ab.bounce': 'vrátí do ruky', 'ab.silence': 'umlčí',
   // target templates
   'tg.self': 'sobě', 'tg.neighbor': 'sousedovi {dir}', 'tg.direction': '{dir}', 'tg.around': 'v okolí',
   'tg.aroundVictim': 'v okolí oběti', 'tg.lowestHpAlly': 'nejslabšímu spojenci', 'tg.allEnemies': 'všem nepřátelům',
-  'tg.allAllies': 'všem spojencům', 'tg.enemyQueen': 'nepřátelské Královně',
+  'tg.allAllies': 'všem spojencům', 'tg.enemyQueen': 'nepřátelské Královně', 'tg.randomEnemy': 'náhodnému nepříteli',
   // log
   'log.shieldAbsorb': '🛡️ {card} pohltil štítem {n}', 'log.damage': '💥 {card} dostal {n}',
   'log.heal': '❤️ {card} vyléčen o {n}', 'log.destroy': '☠️ {card} zničen',
@@ -126,6 +127,7 @@ const cs: Dict = {
   'log.guard': '⚠️ pojistka fronty událostí',
   'log.unknownTarget': '⚠️ neznámý cíl {name}', 'log.unknownEffect': '⚠️ neznámý efekt {name}',
   'log.activate': '✨ {card} použil schopnost',
+  'log.bounce': '↩️ {card} vrácen do ruky', 'log.silence': '🔇 {card} umlčen',
   // card names
   'card.queen': 'Královna', 'card.recruit': 'Rekrut', 'card.spearman': 'Kopiník', 'card.archer': 'Lučištník',
   'card.medic': 'Zdravotník', 'card.wall': 'Křeček-zeď', 'card.minelayer': 'Minér', 'card.reaper': 'Kosec',
@@ -133,6 +135,10 @@ const cs: Dict = {
   'card.runeshield': 'Runový štít', 'card.avenger': 'Mstitel', 'card.timebomb': 'Časovaná bomba',
   'card.cannon': 'Dělo', 'card.pyro': 'Pyroman', 'card.commander': 'Velitel',
   'card.zealot': 'Fanatik', 'card.healer': 'Léčitel', 'card.zapper': 'Zaklínač', 'card.banner': 'Válečná standarta',
+  'card.slinger': 'Prakovník', 'card.squire': 'Panoš', 'card.brute': 'Rváč', 'card.scout': 'Zvěd',
+  'card.shover': 'Postrkovač', 'card.sapper': 'Zákopník', 'card.cleric': 'Klerik', 'card.hexer': 'Kletbář',
+  'card.sniper': 'Odstřelovač', 'card.bouncer': 'Vyhazovač', 'card.silencer': 'Umlčovač', 'card.summoner': 'Přivolávač',
+  'card.warlord': 'Válečník', 'card.plague': 'Morová vrána', 'card.archmage': 'Arcimág', 'card.titan': 'Titán',
 };
 
 const en: Dict = {
@@ -186,9 +192,10 @@ const en: Dict = {
   'ab.damage': 'deals {n} dmg', 'ab.heal': 'heals {n}', 'ab.shield': 'shield {n}', 'ab.buff': '+{atk}/{hp}',
   'ab.destroy': 'destroys', 'ab.terrain': 'places {t}', 'ab.discardRandom': 'discards a random enemy card',
   'ab.draw': 'draw {n}', 'ab.summon': 'summons a unit',
+  'ab.push': 'pushes', 'ab.pull': 'pulls', 'ab.bounce': 'returns to hand', 'ab.silence': 'silences',
   'tg.self': 'self', 'tg.neighbor': 'neighbor {dir}', 'tg.direction': '{dir}', 'tg.around': 'around',
   'tg.aroundVictim': 'around the victim', 'tg.lowestHpAlly': 'weakest ally', 'tg.allEnemies': 'all enemies',
-  'tg.allAllies': 'all allies', 'tg.enemyQueen': 'enemy Queen',
+  'tg.allAllies': 'all allies', 'tg.enemyQueen': 'enemy Queen', 'tg.randomEnemy': 'a random enemy',
   'log.shieldAbsorb': '🛡️ {card} absorbed {n} with shield', 'log.damage': '💥 {card} took {n}',
   'log.heal': '❤️ {card} healed {n}', 'log.destroy': '☠️ {card} destroyed',
   'log.queenFell': "👑 {owner}'s Queen fell — {winner} wins!", 'log.summon': '✨ {card} summoned',
@@ -199,12 +206,17 @@ const en: Dict = {
   'log.guard': '⚠️ event queue guard tripped',
   'log.unknownTarget': '⚠️ unknown target {name}', 'log.unknownEffect': '⚠️ unknown effect {name}',
   'log.activate': '✨ {card} used its ability',
+  'log.bounce': '↩️ {card} returned to hand', 'log.silence': '🔇 {card} silenced',
   'card.queen': 'Queen', 'card.recruit': 'Recruit', 'card.spearman': 'Spearman', 'card.archer': 'Archer',
   'card.medic': 'Medic', 'card.wall': 'Wall Hamster', 'card.minelayer': 'Minelayer', 'card.reaper': 'Reaper',
   'card.protector': 'Protector', 'card.berserk': 'Berserker', 'card.courier': 'Courier', 'card.vengetree': 'Vengeful Tree',
   'card.runeshield': 'Runeshield', 'card.avenger': 'Avenger', 'card.timebomb': 'Time Bomb',
   'card.cannon': 'Cannon', 'card.pyro': 'Pyromancer', 'card.commander': 'Commander',
   'card.zealot': 'Zealot', 'card.healer': 'Healer', 'card.zapper': 'Zapper', 'card.banner': 'War Banner',
+  'card.slinger': 'Slinger', 'card.squire': 'Squire', 'card.brute': 'Brute', 'card.scout': 'Scout',
+  'card.shover': 'Shover', 'card.sapper': 'Sapper', 'card.cleric': 'Cleric', 'card.hexer': 'Hexer',
+  'card.sniper': 'Sniper', 'card.bouncer': 'Bouncer', 'card.silencer': 'Silencer', 'card.summoner': 'Summoner',
+  'card.warlord': 'Warlord', 'card.plague': 'Plague Crow', 'card.archmage': 'Archmage', 'card.titan': 'Titan',
 };
 
 const STRINGS: Record<Lang, Dict> = { cs, en };
