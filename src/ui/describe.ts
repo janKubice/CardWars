@@ -1,4 +1,4 @@
-import type { AbilityDef, CardInstance } from '../engine/index.ts';
+import type { AbilityDef, CardDef, CardInstance } from '../engine/index.ts';
 
 // Převod schopnosti na krátký český text (do tooltipu / detailu karty).
 
@@ -72,8 +72,18 @@ export function describeAbility(a: AbilityDef): string {
   return `${trig}${count}: ${parts}`;
 }
 
+function keywordLabel(k: string): string {
+  return k === 'charge' ? 'Nájezd' : k === 'fragile' ? 'Křehkost' : k;
+}
+
 export function describeCard(c: CardInstance): string {
-  const kw = c.keywords.map((k) => (k === 'charge' ? 'Nájezd' : k === 'fragile' ? 'Křehkost' : k));
+  const kw = c.keywords.map(keywordLabel);
   const lines = c.abilities.map(describeAbility);
+  return [...kw, ...lines].join(' • ');
+}
+
+export function describeDef(def: CardDef): string {
+  const kw = (def.keywords ?? []).map(keywordLabel);
+  const lines = (def.abilities ?? []).map(describeAbility);
   return [...kw, ...lines].join(' • ');
 }

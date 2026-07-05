@@ -98,6 +98,45 @@ button[data-action="newgame"] { background: var(--panel); border: 1px solid var(
 }
 .log div { padding: 1px 0; }
 
+.runbar {
+  text-align: center; color: var(--gold); font-weight: 700;
+  background: var(--panel); border: 1px solid var(--line);
+  border-radius: 8px; padding: 6px; margin-bottom: 10px;
+}
+.runbar.big { font-size: 18px; padding: 10px; }
+
+/* ── Obchod ── */
+.shop { padding-bottom: 24px; }
+.shop h3 { margin: 16px 0 8px; }
+.shopgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; }
+.shopcard {
+  background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+  padding: 10px; display: flex; flex-direction: column; gap: 6px;
+}
+.shopcard.sold { opacity: 0.4; }
+.shopcard.rar-uncommon { border-left: 3px solid #4ade80; }
+.shopcard.rar-rare { border-left: 3px solid #60a5fa; }
+.shopcard.rar-epic { border-left: 3px solid #c084fc; }
+.shopcard.rar-legendary { border-left: 3px solid var(--gold); }
+.sc-top { display: flex; justify-content: space-between; align-items: baseline; }
+.sc-name { font-weight: 700; }
+.sc-rar { font-size: 10px; color: var(--muted); text-transform: uppercase; }
+.sc-stats { font-size: 13px; color: #cbd5e1; }
+.sc-abil { font-size: 11px; color: var(--muted); min-height: 28px; line-height: 1.25; }
+.shopcard button { padding: 6px; font-size: 13px; }
+.muted { color: var(--muted); }
+
+.shopactions { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+button.primary { background: var(--gold); color: #000; }
+
+.decklist { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 4px 12px; }
+.deckrow {
+  display: flex; justify-content: space-between; align-items: center;
+  border-bottom: 1px solid var(--line); padding: 3px 0; font-size: 13px;
+}
+button.mini { padding: 2px 8px; font-size: 12px; background: var(--b-dark); }
+.modal.center { margin: 40px auto; max-width: 420px; }
+
 .overlay {
   position: fixed; inset: 0; background: rgba(0,0,0,0.7);
   display: flex; align-items: center; justify-content: center;

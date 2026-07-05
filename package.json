@@ -9,7 +9,8 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
-    "smoke": "node --experimental-strip-types scripts/smoke.ts"
+    "smoke": "node --experimental-strip-types scripts/smoke.ts",
+    "runsmoke": "node --experimental-strip-types scripts/runsmoke.ts"
   },
   "devDependencies": {
     "playwright": "^1.61.1",

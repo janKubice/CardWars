@@ -14,9 +14,12 @@ Vítězná podmínka je jednoduchá jako v šachu: **padne Královna, končí hr
 
 ## Stav projektu
 
-**Hratelné MVP jádra běží.** Deska 7×6, přiléhavé pokládání, energie, souboj, systém schopností a bot — vše v prohlížeči. Buildne se do **jednoho HTML souboru** (~29 kB) pro itch.io.
+**Hratelné roguelike MVP běží.** Kompletní smyčka: **obchod → souboj → obchod**, 8 ante proti sílícímu botovi, stavění balíčku za zlato. Deska 7×6, přiléhavé pokládání, energie, souboj, systém schopností. Vše v prohlížeči, buildí se do **jednoho HTML souboru** (~35 kB) pro itch.io.
 
-![CardWars MVP](docs/img/mvp.png)
+Souboj a obchod:
+
+![CardWars souboj](docs/img/mvp.png)
+![CardWars obchod](docs/img/shop.png)
 
 Plán platforem: MVP na webu/itch → případná plná verze v **C#/Unity na Steam** → **multiplayer + ELO** do budoucna. Detaily v [`docs/09-technologie.md`](docs/09-technologie.md).
 
@@ -26,7 +29,8 @@ Plán platforem: MVP na webu/itch → případná plná verze v **C#/Unity na St
 npm install
 npm run dev        # hraní v prohlížeči (vývojový server)
 npm run build      # -> dist/index.html (jeden soubor pro itch.io)
-npm run smoke      # headless test: bot vs bot, 20 partií musí dojet do konce
+npm run smoke      # headless: bot vs bot, 20 partií musí dojet do konce
+npm run runsmoke   # headless: 40 celých runů musí skončit (won/lost)
 ```
 
 ## Kde co najdeš

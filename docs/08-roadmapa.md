@@ -37,11 +37,12 @@ Cíl: **jeden hratelný souboj** na desce 7×6, žádná ekonomika, pevný balí
 
 ## Fáze 2 – Roguelike smyčka („je důvod hrát dál?")
 
-- [ ] Obchod mezi koly: koupit / odstranit / reroll.
-- [ ] Zlato a odměny za výhru.
-- [ ] Vylepšování karet (Level).
-- [ ] Struktura runu (série soubojů, rostoucí obtížnost).
-- [ ] Rozšíření na ~40–50 karet + pokročilé keywordy (Odpočet, Aura, Aktivace, Teren/miny).
+- [x] Obchod mezi koly: koupit / odstranit / reroll (váhy rarit rostou s ante).
+- [x] Zlato a odměny za výhru.
+- [x] Struktura runu: 8 ante, rostoucí obtížnost bota, obrazovky obchod → souboj → konec.
+- [x] Test: `npm run runsmoke` (40/40 runů vždy skončí won/lost).
+- [ ] Vylepšování karet (Level) — zatím neimplementováno.
+- [ ] Rozšíření na ~40–50 karet + pokročilé keywordy (Aura, Aktivace).
 
 **Test úspěchu:** *„Chce se mi dokončit run?"*
 
