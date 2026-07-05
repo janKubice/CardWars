@@ -54,7 +54,7 @@ console.log(`souboj: buňky=${cells}, královny=${queens}`);
 // 5) Polož jednotku (během pár tahů)
 let played = false;
 for (let round = 0; round < 5 && !played; round++) {
-  const aff = page.locator('.hcard:not(.is-dim)').first();
+  const aff = page.locator('.hslot:not(.is-dim)').first();
   if (await aff.count()) {
     await aff.click();
     const legal = page.locator('.cell.legal');

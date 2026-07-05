@@ -4,7 +4,7 @@ import { GameEngine, key } from './engine/index.ts';
 import { stepBot } from './ai/bot.ts';
 import { LIBRARY } from './content/cards.ts';
 import { describeCard, describeDef, describeAbility } from './ui/describe.ts';
-import { initSprites, frameFor } from './ui/sprites.ts';
+import { initSprites, frameFor, iconFor } from './ui/sprites.ts';
 import { t, cardName, formatLog, getLang, setLang, type Lang } from './i18n/index.ts';
 import {
   createRun, makeBattleConfig, startBattle, onBattleWin, onBattleLoss,
@@ -37,7 +37,13 @@ const CARD_ART: Record<string, string> = {
   sniper: '🎯', bouncer: '🚪', silencer: '🤫', summoner: '🌀', warlord: '🎗️', plague: '🐦‍⬛',
   archmage: '🧙', titan: '🗿',
 };
-const cardArt = (defId: string) => CARD_ART[defId] ?? '❔';
+// pixel-art ikona ze sheetu; Královna má korunu, jinak fallback na emoji
+function cardArt(defId: string): string {
+  if (defId === 'queen') return '<span class="artemoji">👑</span>';
+  const uri = iconFor(defId);
+  if (uri) return `<span class="spr" style="background-image:url(${uri})"></span>`;
+  return `<span class="artemoji">${CARD_ART[defId] ?? '❔'}</span>`;
+}
 
 // vrstva pro efekty (plovoucí čísla, záblesky) — přežívá překreslení #app
 const fx = document.createElement('div');
@@ -211,14 +217,19 @@ function renderBoard(b: BattleState): string {
 }
 function renderHand(b: BattleState): string {
   const p = b.engine.state.players[HUMAN];
+  const frame = frameFor(HUMAN, false);
+  const bg = frame ? `style="background-image:url(${frame})"` : '';
   const chips = b.engine.handOf(HUMAN).map((c) => {
     const sel = b.selection?.type === 'hand' && b.selection.uid === c.uid ? 'is-sel' : '';
     const aff = c.cost <= p.energy ? '' : 'is-dim';
-    return `<div class="hcard r-${rarityOf(c.defId)} ${sel} ${aff}" data-hand="${c.uid}" title="${escapeAttr(describeCard(c) || cardName(c.defId))}">
-        <span class="hcard__cost">${c.cost}</span>
-        <div class="hcard__name">${escapeHtml(cardName(c.defId))}</div>
-        <div class="hcard__art">${cardArt(c.defId)}</div>
-        <div class="hcard__foot"><span class="atk">${c.attack}</span><span class="hp">${c.hp}/${c.maxHp}</span>${c.range > 1 ? `<span class="rng">🏹${c.range}</span>` : ''}</div>
+    const rng = c.range > 1 ? `<span class="hrng">🏹${c.range}</span>` : '';
+    return `<div class="hslot ${sel} ${aff}" data-hand="${c.uid}" title="${escapeAttr(describeCard(c) || cardName(c.defId))}">
+        <div class="pc pc--a hframe r-${rarityOf(c.defId)}" ${bg}>
+          <span class="hcost">${c.cost}</span>${rng}
+          <div class="pc__art">${cardArt(c.defId)}</div>
+          <div class="pc__foot"><span class="atk">${c.attack}</span><span class="hp">${c.hp}/${c.maxHp}</span></div>
+        </div>
+        <div class="hcaption">${escapeHtml(cardName(c.defId))}</div>
       </div>`;
   }).join('');
   return `<div class="hand">${chips || `<div class="empty">—</div>`}</div>`;
@@ -301,6 +312,7 @@ function renderShop(): string {
     const abil = describeDef(def);
     return `<div class="shopcard r-${def.rarity} ${item.sold ? 'sold' : ''}">
         <div class="shopcard__head">
+          <span class="spr shopicon" style="background-image:url(${iconFor(def.id)})"></span>
           <span class="shopcard__name">${escapeHtml(cardName(def.id))}</span>
           <span class="shopcard__rar r-txt-${def.rarity}">${t('rar.' + def.rarity)}</span>
         </div>

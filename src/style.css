@@ -161,26 +161,29 @@ button:disabled { opacity: .4; cursor: not-allowed; }
 .bdg.shield { color: #9fd0ff; } .bdg.count { color: #ffd27a; } .bdg.rng { color: #cfe3ff; }
 
 /* ── ruka ── */
-.hand { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; min-height: 88px; justify-content: center; }
-.hcard {
-  width: 86px; background: linear-gradient(180deg, var(--panel2), var(--panel));
-  border: 1px solid var(--line); border-bottom: 3px solid var(--rar, #888);
-  border-radius: 10px; padding: 8px 8px 6px; position: relative; cursor: pointer;
-  transition: transform .1s ease, box-shadow .15s ease;
-}
-.hcard:hover { transform: translateY(-5px); box-shadow: 0 8px 18px rgba(0,0,0,.4); }
-.hcard.is-sel { transform: translateY(-6px); box-shadow: 0 0 0 2px var(--gold), 0 8px 20px rgba(242,193,78,.35); }
-.hcard.is-dim { opacity: .42; }
-.hcard__cost {
-  position: absolute; top: -8px; left: -8px; width: 24px; height: 24px; border-radius: 50%;
+.hand { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; min-height: 120px; justify-content: center; align-items: flex-end; }
+.hslot { width: 76px; cursor: pointer; transition: transform .1s ease; }
+.hslot:hover { transform: translateY(-5px); }
+.hslot.is-sel { transform: translateY(-7px); }
+.hslot.is-sel .pc { filter: drop-shadow(0 0 3px #fff) drop-shadow(0 0 6px var(--gold)); }
+.hslot.is-dim { opacity: .45; }
+.hframe { width: 100% !important; height: auto !important; aspect-ratio: 68 / 95; }
+.hcost {
+  position: absolute; top: -7px; left: -7px; width: 23px; height: 23px; border-radius: 50%;
   background: radial-gradient(circle at 35% 30%, #fff2c0, var(--gold)); color: #201400;
   display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 13px;
-  box-shadow: 0 2px 6px rgba(0,0,0,.4);
+  box-shadow: 0 2px 6px rgba(0,0,0,.45); z-index: 3;
 }
-.hcard__name { font-weight: 700; font-size: 12px; margin: 2px 0 2px; }
-.hcard__art { font-size: 24px; text-align: center; margin: 2px 0 4px; filter: drop-shadow(0 1px 2px rgba(0,0,0,.5)); }
-.hcard__foot { display: flex; gap: 6px; font-size: 12px; font-weight: 800; }
+.hrng { position: absolute; top: -6px; right: -4px; font-size: 11px; background: rgba(0,0,0,.6); border-radius: 6px; padding: 0 3px; z-index: 3; }
+.hcaption { text-align: center; font-size: 11px; margin-top: 3px; font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .empty { color: var(--muted); padding: 24px; }
+
+/* pixel-art sprite ikony */
+.spr { display: inline-block; width: 30px; height: 30px; background-repeat: no-repeat; background-position: center; background-size: contain; image-rendering: pixelated; }
+.hframe .spr { width: 24px; height: 24px; }
+.shopicon { width: 26px; height: 26px; flex: 0 0 auto; }
+.artemoji { font-size: 26px; line-height: 1; filter: drop-shadow(0 1px 1px rgba(0,0,0,.5)); }
+.hframe .artemoji { font-size: 20px; }
 
 /* ── ovládání ── */
 .actionbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; background: rgba(255,255,255,.04); border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; margin-bottom: 10px; }
@@ -211,8 +214,8 @@ button:disabled { opacity: .4; cursor: not-allowed; }
   border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 7px;
 }
 .shopcard.sold { opacity: .4; }
-.shopcard__head { display: flex; justify-content: space-between; align-items: baseline; gap: 6px; }
-.shopcard__name { font-weight: 700; }
+.shopcard__head { display: flex; align-items: center; gap: 6px; }
+.shopcard__name { font-weight: 700; flex: 1; }
 .shopcard__rar { font-size: 10px; text-transform: uppercase; letter-spacing: .5px; }
 .shopcard__stats { font-size: 14px; font-weight: 700; }
 .shopcard__stats .cost { color: var(--gold); }
