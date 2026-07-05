@@ -102,7 +102,8 @@ Karty jsou po vyložení **v zásadě statické** — nechodí po desce jako v R
 
 - Hráč má **ruku** (skryté karty) a **balíček** (dobírací).
 - Na začátku tahu **dobíráš** (výchozí: 1 karta/tah; některé karty a komba dobírání zrychlují).
-- Strop ruky (výchozí ~10); přeteklé karty se pálí (nebo je nelze dobrat) — [otevřená otázka](07-otevrene-otazky.md).
+- Strop ruky (výchozí ~10); přeteklé karty se **pálí**.
+- **Únava (fatigue):** když má hráč prázdný balíček a měl by dobírat, dostane jeho **Královna rostoucí zranění** (1, 2, 3, …). Zaručuje, že partie **skončí** (a podpírá severku „hry mají končit"). Bez toho by kvůli pravidlu přiléhavosti mohlo dojít k věčnému patu, když se obě kolonie nikdy nepropojí. *(Ověřeno: bez únavy se cca 1 z 20 botích partií zasekla; s únavou 20/20 dojede.)*
 - **Combo pokládání:** některé karty říkají „*Vylož: můžeš tento tah položit další kartu*" nebo vrací energii → řetězení více vyložení za tah. To je herní ekvivalent Balatro komb.
 
 ---

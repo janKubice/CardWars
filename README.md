@@ -14,7 +14,20 @@ Vítězná podmínka je jednoduchá jako v šachu: **padne Královna, končí hr
 
 ## Stav projektu
 
-Zatím **fáze návrhu** — jádro pravidel je rozhodnuté, kód zatím žádný. Plán platforem: **MVP jako jeden HTML soubor na itch.io** (test nápadu), případná plná verze v **C#/Unity na Steam**, a **multiplayer + ELO** až do budoucna. Detaily v [`docs/09-technologie.md`](docs/09-technologie.md).
+**Hratelné MVP jádra běží.** Deska 7×6, přiléhavé pokládání, energie, souboj, systém schopností a bot — vše v prohlížeči. Buildne se do **jednoho HTML souboru** (~29 kB) pro itch.io.
+
+![CardWars MVP](docs/img/mvp.png)
+
+Plán platforem: MVP na webu/itch → případná plná verze v **C#/Unity na Steam** → **multiplayer + ELO** do budoucna. Detaily v [`docs/09-technologie.md`](docs/09-technologie.md).
+
+## Spuštění
+
+```bash
+npm install
+npm run dev        # hraní v prohlížeči (vývojový server)
+npm run build      # -> dist/index.html (jeden soubor pro itch.io)
+npm run smoke      # headless test: bot vs bot, 20 partií musí dojet do konce
+```
 
 ## Kde co najdeš
 
@@ -29,6 +42,7 @@ Zatím **fáze návrhu** — jádro pravidel je rozhodnuté, kód zatím žádn�
 | [`docs/07-otevrene-otazky.md`](docs/07-otevrene-otazky.md) | Rozhodnutí, která je potřeba společně dořešit |
 | [`docs/08-roadmapa.md`](docs/08-roadmapa.md) | MVP a milníky vývoje |
 | [`docs/09-technologie.md`](docs/09-technologie.md) | Tech a platformy: web MVP (jeden HTML soubor, itch) → C#/Unity (Steam) → MP + ELO |
+| [`docs/10-architektura.md`](docs/10-architektura.md) | Architektura kódu + kuchařka „jak přidat nový efekt / trigger / kartu" |
 
 ## Jak s dokumentací pracujeme
 

@@ -16,17 +16,20 @@ Vývojová strategie stojí na jednom principu: **nejdřív dokázat, že jádro
 
 ## Fáze 1 – MVP jádra („je to vůbec zábava?")
 
-Cíl: **jeden hratelný souboj** na desce 7×6, žádná ekonomika, pevný balíček. Postaveno jako web (TS + DOM/CSS), s **oddělením engine od renderu** od prvního dne (viz [09](09-technologie.md)).
+Cíl: **jeden hratelný souboj** na desce 7×6, žádná ekonomika, pevný balíček. Postaveno jako web (TS + DOM/CSS), s **oddělením engine od renderu** od prvního dne (viz [09](09-technologie.md), [10-architektura](10-architektura.md)).
 
-- [ ] Kostra projektu: TS + Vite, engine (čistá logika) oddělený od renderu.
-- [ ] Deska 7×6 + vykreslení mřížky (CSS grid), dvě Královny.
-- [ ] Pravidlo přiléhavého pokládání (8-sousedství).
-- [ ] Energie + tahy.
-- [ ] Souboj: útok, dostřel, protiúder, ničení, HP, únava z vyložení.
-- [ ] ~15–20 karet z [ukázkového setu](04-seznam-karet.md) (jen základní keywordy: Vylož, Skon, Úsvit, Damage/Heal/Štít).
-- [ ] Vítězná podmínka (padne Královna).
-- [ ] Nejjednodušší bot (skóruje 1 akci dopředu).
-- [ ] Export do **jednoho HTML souboru** a nahrání na **itch.io** k testu.
+- [x] Kostra projektu: TS + Vite, engine (čistá logika) oddělený od renderu.
+- [x] Deska 7×6 + vykreslení mřížky (CSS grid), dvě Královny.
+- [x] Pravidlo přiléhavého pokládání (8-sousedství).
+- [x] Energie + tahy (rampující 1→10).
+- [x] Souboj: útok, dostřel, protiúder, ničení, HP, únava z vyložení.
+- [x] Systém klíčových slov: registry efektů/cílů + fronta událostí (řetězení komb).
+- [x] ~17 karet z [ukázkového setu](04-seznam-karet.md) (Vylož, Skon, Úsvit, Zranění, Vyléčení, Zaštítění, Odpočet, Zabití, terén/miny…).
+- [x] Vítězná podmínka (padne Královna) + únava proti patu.
+- [x] Nejjednodušší bot (heuristické skórování akcí).
+- [x] Testy: `npm run smoke` (20/20 partií dojede), `uicheck.mjs` (běží v prohlížeči).
+- [x] Export do **jednoho HTML souboru** (`npm run build` → `dist/index.html`, ~29 kB).
+- [ ] Nahrát na **itch.io** a získat zpětnou vazbu z hraní.
 
 **Test úspěchu:** *„Chce se mi hrát druhou partii?"* Pokud ne → ladíme jádro, **nepřidáváme obsah.**
 

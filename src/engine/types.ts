@@ -1,0 +1,120 @@
+// Základní datové typy enginu. Žádná logika, žádný DOM — čistá data.
+
+export type PlayerId = 'A' | 'B';
+export type Rarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
+export type Edge = 'top' | 'bottom';
+
+/**
+ * Trigger je záměrně `string`, ne uzavřený enum — díky tomu jde přidat nový
+ * trigger bez zásahu do typů. Známé triggery jsou v konstantě TRIGGERS níže.
+ */
+export type TriggerType = string;
+
+export const TRIGGERS = {
+  deploy: 'deploy',
+  death: 'death',
+  wound: 'wound',
+  onHeal: 'onHeal',
+  onShield: 'onShield',
+  attack: 'attack',
+  kill: 'kill',
+  upkeepStart: 'upkeepStart',
+  upkeepEnd: 'upkeepEnd',
+  countdown: 'countdown',
+} as const;
+
+export interface Position {
+  row: number;
+  col: number;
+}
+
+/**
+ * Jedna schopnost = trojice Trigger -> Efekt -> Cíl (+ parametry).
+ * `effect` a `target` jsou klíče do registru (viz registries.ts) — proto string.
+ */
+export interface AbilityDef {
+  trigger: TriggerType;
+  effect: string;
+  target: string;
+  params?: Record<string, unknown>;
+}
+
+/** Statická definice karty ("blueprint"). Přenositelná 1:1 do C# verze. */
+export interface CardDef {
+  id: string;
+  name: string;
+  rarity: Rarity;
+  cost: number;
+  hp: number;
+  attack: number;
+  range: number;
+  tags?: string[];
+  /** pasivní příznaky, např. 'charge' (Nájezd), 'fragile' (Křehkost) */
+  keywords?: string[];
+  abilities?: AbilityDef[];
+  isQueen?: boolean;
+  flavor?: string;
+}
+
+/** Běžící instance karty na desce nebo v ruce (mutovatelný stav). */
+export interface CardInstance {
+  uid: number;
+  defId: string;
+  name: string;
+  owner: PlayerId;
+  cost: number;
+  hp: number;
+  maxHp: number;
+  attack: number;
+  range: number;
+  shield: number;
+  pos: Position | null;
+  zone: 'hand' | 'board' | 'dead';
+  hasAttacked: boolean;
+  justPlayed: boolean;
+  counters: Record<string, number>;
+  abilities: AbilityDef[];
+  keywords: string[];
+  tags: string[];
+  isQueen: boolean;
+}
+
+export interface TerrainCell {
+  type: string;
+  params?: Record<string, unknown>;
+}
+
+export interface PlayerState {
+  id: PlayerId;
+  energy: number;
+  maxEnergy: number;
+  homeEdge: Edge;
+  hand: number[];
+  deck: string[];
+  handLimit: number;
+  /** kolikrát hráč tahal z prázdného balíčku (roste zranění únavou) */
+  fatigue: number;
+}
+
+export interface RngState {
+  seed: number;
+}
+
+export interface GameState {
+  rows: number;
+  cols: number;
+  /** grid[row][col] -> uid karty nebo null */
+  grid: (number | null)[][];
+  cards: Map<number, CardInstance>;
+  players: Record<PlayerId, PlayerState>;
+  active: PlayerId;
+  turnNumber: number;
+  terrain: Map<string, TerrainCell>;
+  winner: PlayerId | null;
+  log: string[];
+  nextUid: number;
+  rng: RngState;
+  energyCap: number;
+  /** knihovna definic karet (data), potřebná pro spawn/instanciaci */
+  library: Record<string, CardDef>;
+}
