@@ -34,6 +34,11 @@ await page.locator('button[data-action="newrun"]').click();
 await page.waitForSelector('.shop');
 const shopCards = await page.locator('.shopcard').count();
 console.log(`obchod: ${shopCards} karet`);
+// vylepšení karty (gold 4 na startu → cena 3)
+const upBtn = page.locator('button[data-action="upgrade"]:not([disabled])').first();
+let upgraded = false;
+if (await upBtn.count()) { await upBtn.click(); upgraded = (await page.locator('.lvl').count()) > 0; console.log(`vylepšení ✓ (lvl tag: ${upgraded})`); }
+// nákup
 const buyBtn = page.locator('.shopcard .buy:not([disabled])').first();
 if (await buyBtn.count()) { await buyBtn.click(); console.log('nákup ✓'); }
 await page.waitForTimeout(400);
@@ -65,5 +70,6 @@ await browser.close();
 if (cells !== 42) { console.error('CHYBA: nečekaný počet buněk'); process.exit(1); }
 if (queens !== 2) { console.error('CHYBA: nejsou 2 královny'); process.exit(1); }
 if (shopCards !== 5) { console.error('CHYBA: obchod nemá 5 karet'); process.exit(1); }
+if (!upgraded) { console.error('CHYBA: vylepšení karty se neprojevilo'); process.exit(1); }
 if (errors.length) { console.error('CHYBA konzole:', errors.slice(0, 5)); process.exit(1); }
 console.log('OK ✅ menu + jazyk + obchod + souboj fungují v prohlížeči.');

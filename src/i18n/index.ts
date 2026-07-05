@@ -66,6 +66,7 @@ const cs: Dict = {
   'shop.noAbility': 'bez schopnosti',
   'shop.wins': 'výher',
   'shop.remove': 'Odebrat',
+  'shop.upgrade': 'Vylepšit (+1/+1)',
   // battle
   'battle.you': 'TY',
   'battle.bot': 'BOT',
@@ -144,6 +145,7 @@ const en: Dict = {
   'shop.noAbility': 'no ability',
   'shop.wins': 'wins',
   'shop.remove': 'Remove',
+  'shop.upgrade': 'Upgrade (+1/+1)',
   'battle.you': 'YOU',
   'battle.bot': 'BOT',
   'battle.turn': 'Turn',

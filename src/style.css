@@ -216,7 +216,11 @@ button:disabled { opacity: .4; cursor: not-allowed; }
 .shopactions .primary { margin-left: auto; }
 .shop h3 { margin: 12px 0 8px; font-family: var(--serif); }
 .decklist { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 4px 14px; }
-.deckrow { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--line); padding: 4px 0; font-size: 13px; }
+.deckrow { display: flex; justify-content: space-between; align-items: center; gap: 8px; border-bottom: 1px solid var(--line); padding: 4px 0; font-size: 13px; }
+.deckrow__btns { display: inline-flex; gap: 6px; flex-shrink: 0; }
+.lvl { color: #7be0a4; font-weight: 800; margin-left: 4px; }
+.maxlvl { color: var(--gold); font-weight: 800; font-size: 11px; align-self: center; }
+button.mini.up { background: #1c4a2e; border-color: #2e6b45; }
 
 /* ── overlay / modal / konec ── */
 .overlay { position: fixed; inset: 0; background: rgba(6,8,16,.72); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; animation: fadeIn .2s ease; z-index: 10; }

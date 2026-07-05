@@ -7,7 +7,8 @@ import { describeCard, describeDef } from './ui/describe.ts';
 import { t, cardName, formatLog, getLang, setLang, type Lang } from './i18n/index.ts';
 import {
   createRun, makeBattleConfig, startBattle, onBattleWin, onBattleLoss,
-  buy, reroll, removeCard, deckSummary, cardDef, REMOVE_COST, MAX_ANTE,
+  buy, reroll, removeCard, upgrade, canUpgrade, upgradeCost,
+  deckSummary, cardDef, REMOVE_COST, MAX_ANTE, MAX_LEVEL,
   type RunState,
 } from './run/run.ts';
 
@@ -209,10 +210,16 @@ function renderShop(): string {
         </button>
       </div>`;
   }).join('');
-  const deck = deckSummary(r).map((d) => `<div class="deckrow">
-        <span>${d.count}× <b>${escapeHtml(cardName(d.defId))}</b> <span class="muted">⚡${d.cost}</span></span>
-        <button class="mini" data-action="remove" data-def="${d.defId}" ${r.gold >= REMOVE_COST ? '' : 'disabled'} title="${t('shop.remove')}">−🪙${REMOVE_COST}</button>
-      </div>`).join('');
+  const deck = deckSummary(r).map((d) => {
+    const lvlTag = d.level > 0 ? `<span class="lvl">+${d.level}</span>` : '';
+    const upBtn = d.level >= MAX_LEVEL
+      ? `<span class="maxlvl">MAX</span>`
+      : `<button class="mini up" data-action="upgrade" data-def="${d.defId}" ${canUpgrade(r, d.defId) ? '' : 'disabled'} title="${t('shop.upgrade')}">⬆🪙${upgradeCost(d.level)}</button>`;
+    return `<div class="deckrow">
+        <span>${d.count}× <b>${escapeHtml(cardName(d.defId))}</b>${lvlTag} <span class="muted">⚡${d.cost}</span></span>
+        <span class="deckrow__btns">${upBtn}<button class="mini" data-action="remove" data-def="${d.defId}" ${r.gold >= REMOVE_COST ? '' : 'disabled'} title="${t('shop.remove')}">−🪙${REMOVE_COST}</button></span>
+      </div>`;
+  }).join('');
   return `${langBar(true)}
     <div class="shop">
       <div class="shopbar">
@@ -310,6 +317,7 @@ function handleAction(action: string, el: HTMLElement): void {
     case 'reroll': if (run) { reroll(run); render(); } break;
     case 'buy': if (run) { buy(run, Number(el.dataset.idx)); render(); } break;
     case 'remove': if (run) { removeCard(run, el.dataset.def as string); render(); } break;
+    case 'upgrade': if (run) { upgrade(run, el.dataset.def as string); render(); } break;
   }
 }
 

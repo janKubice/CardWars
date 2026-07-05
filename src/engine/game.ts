@@ -19,6 +19,7 @@ export interface GameConfig {
   handLimit?: number;
   library: Record<string, CardDef>;
   decks: Record<PlayerId, string[]>;
+  levels?: Record<PlayerId, Record<string, number>>;
   queenId?: string;
 }
 
@@ -257,8 +258,8 @@ function createInitialState(config: GameConfig): GameState {
     grid,
     cards: new Map(),
     players: {
-      A: { id: 'A', energy: 0, maxEnergy: 0, homeEdge: 'bottom', hand: [], deck: [], handLimit, fatigue: 0 },
-      B: { id: 'B', energy: 0, maxEnergy: 0, homeEdge: 'top', hand: [], deck: [], handLimit, fatigue: 0 },
+      A: { id: 'A', energy: 0, maxEnergy: 0, homeEdge: 'bottom', hand: [], deck: [], handLimit, fatigue: 0, levels: config.levels?.A ?? {} },
+      B: { id: 'B', energy: 0, maxEnergy: 0, homeEdge: 'top', hand: [], deck: [], handLimit, fatigue: 0, levels: config.levels?.B ?? {} },
     },
     active: 'A',
     turnNumber: 0,

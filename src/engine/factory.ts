@@ -20,6 +20,9 @@ export function instantiate(
   const abilities = (def.abilities ?? []).map((a) => ({ ...a, params: { ...(a.params ?? {}) } }));
   const counters: Record<string, number> = {};
 
+  // Vylepšení: každá úroveň přidá +1 útok a +1 život.
+  const level = state.players[owner]?.levels?.[def.id] ?? 0;
+
   // Odpočet: inicializuj počítadlo podle params.count.
   for (const ab of abilities) {
     if (ab.trigger === TRIGGERS.countdown) {
@@ -34,9 +37,9 @@ export function instantiate(
     name: def.name,
     owner,
     cost: def.cost,
-    hp: def.hp,
-    maxHp: def.hp,
-    attack: def.attack,
+    hp: def.hp + level,
+    maxHp: def.hp + level,
+    attack: def.attack + level,
     range: def.range,
     shield: 0,
     pos: null,

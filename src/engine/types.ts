@@ -94,6 +94,8 @@ export interface PlayerState {
   handLimit: number;
   /** kolikrát hráč tahal z prázdného balíčku (roste zranění únavou) */
   fatigue: number;
+  /** úrovně vylepšení podle id karty (+level k útoku i životu) */
+  levels: Record<string, number>;
 }
 
 export interface RngState {

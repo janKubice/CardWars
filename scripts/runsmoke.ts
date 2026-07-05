@@ -7,7 +7,7 @@ import { botTakeTurn } from '../src/ai/bot.ts';
 import { nextInt } from '../src/engine/index.ts';
 import {
   createRun, makeBattleConfig, onBattleWin, onBattleLoss, startBattle,
-  buy, reroll, MAX_ANTE, type RunState,
+  buy, reroll, upgrade, MAX_ANTE, type RunState,
 } from '../src/run/run.ts';
 
 declare const process: { exit(code: number): never };
@@ -20,6 +20,8 @@ function shopPhase(run: RunState): void {
       if (nextInt(run.rng, 2) === 0) reroll(run);
     }
   }
+  // občas vylepši náhodnou kartu v balíčku
+  if (run.deck.length) upgrade(run, run.deck[nextInt(run.rng, run.deck.length)]);
 }
 
 function playBattle(run: RunState): 'A' | 'B' | null {

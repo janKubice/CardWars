@@ -41,7 +41,8 @@ Cíl: **jeden hratelný souboj** na desce 7×6, žádná ekonomika, pevný balí
 - [x] Zlato a odměny za výhru.
 - [x] Struktura runu: 8 ante, rostoucí obtížnost bota, obrazovky obchod → souboj → konec.
 - [x] Test: `npm run runsmoke` (40/40 runů vždy skončí won/lost).
-- [ ] Vylepšování karet (Level) — zatím neimplementováno.
+- [x] Vylepšování karet (Level): v obchodě +1/+1 na druh karty (viz [meta §3](05-meta-progrese.md)).
+- [x] Výběr jazyka CS/EN + kompletní vizuální redesign UI.
 - [ ] Rozšíření na ~40–50 karet + pokročilé keywordy (Aura, Aktivace).
 
 **Test úspěchu:** *„Chce se mi dokončit run?"*

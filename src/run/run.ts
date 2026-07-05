@@ -14,6 +14,12 @@ const SHOP_SIZE = 5;
 const MIN_DECK = 8;
 const REROLL_BASE = 1;
 export const REMOVE_COST = 2;
+export const MAX_LEVEL = 3;
+
+/** Cena vylepšení karty z aktuální úrovně na další. */
+export function upgradeCost(level: number): number {
+  return 3 + level * 3;
+}
 
 const PRICE: Record<Rarity, number> = { common: 3, uncommon: 4, rare: 6, epic: 8, legendary: 11 };
 
@@ -42,6 +48,7 @@ export type RunStatus = 'shop' | 'battle' | 'won' | 'lost';
 
 export interface RunState {
   deck: string[];
+  levels: Record<string, number>;
   gold: number;
   ante: number;
   wins: number;
@@ -97,6 +104,7 @@ function pickDef(rng: RngState, ante: number): CardDef {
 export function createRun(seed: number): RunState {
   const run: RunState = {
     deck: [...STARTER_RUN_DECK],
+    levels: {},
     gold: START_GOLD,
     ante: 1,
     wins: 0,
@@ -145,6 +153,24 @@ export function removeCard(run: RunState, defId: string): boolean {
   return true;
 }
 
+export function levelOf(run: RunState, defId: string): number {
+  return run.levels[defId] ?? 0;
+}
+
+export function canUpgrade(run: RunState, defId: string): boolean {
+  const lvl = levelOf(run, defId);
+  return lvl < MAX_LEVEL && run.gold >= upgradeCost(lvl) && run.deck.includes(defId);
+}
+
+/** Vylepší kartu daného id (+1/+1 všem kopiím tohoto druhu v balíčku). */
+export function upgrade(run: RunState, defId: string): boolean {
+  if (!canUpgrade(run, defId)) return false;
+  const lvl = levelOf(run, defId);
+  run.gold -= upgradeCost(lvl);
+  run.levels[defId] = lvl + 1;
+  return true;
+}
+
 /** Vygeneruje botí balíček pro dané ante (o něco napřed proti hráči). */
 export function botDeck(rng: RngState, ante: number): string[] {
   const deck: string[] = ['recruit', 'recruit', 'spearman', 'archer', 'wall'];
@@ -158,7 +184,8 @@ export function makeBattleConfig(run: RunState): GameConfig {
     A: [...run.deck],
     B: botDeck(run.rng, run.ante),
   };
-  return { library: LIBRARY, decks, seed: nextInt(run.rng, 1e9) };
+  const levels: Record<PlayerId, Record<string, number>> = { A: { ...run.levels }, B: {} };
+  return { library: LIBRARY, decks, levels, seed: nextInt(run.rng, 1e9) };
 }
 
 export function onBattleWin(run: RunState): void {
@@ -182,13 +209,13 @@ export function startBattle(run: RunState): void {
 }
 
 /** Přehled balíčku pro UI: počet kusů + jméno, seřazeno podle ceny. */
-export function deckSummary(run: RunState): { defId: string; name: string; cost: number; count: number }[] {
+export function deckSummary(run: RunState): { defId: string; name: string; cost: number; count: number; level: number }[] {
   const counts = new Map<string, number>();
   for (const id of run.deck) counts.set(id, (counts.get(id) ?? 0) + 1);
   return [...counts.entries()]
     .map(([defId, count]) => {
       const def = LIBRARY[defId];
-      return { defId, name: def.name, cost: def.cost, count };
+      return { defId, name: def.name, cost: def.cost, count, level: levelOf(run, defId) };
     })
     .sort((a, b) => a.cost - b.cost || a.name.localeCompare(b.name));
 }

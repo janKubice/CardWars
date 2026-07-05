@@ -34,15 +34,18 @@ Nabídka obchodu se **škáluje s postupem**: čím dál v runu, tím vyšší �
 
 ---
 
-## 3. Vylepšování karet (Level)
+## 3. Vylepšování karet (Level) — *implementováno*
 
-Karta má úrovně. Upgrade dělá jedno z:
+**Aktuální implementace (MVP):** v obchodě vylepšíš **druh karty** (ne jednotlivou kopii) → **+1 síla / +1 život** všem kopiím toho druhu v balíčku. Úrovně max 3, cena roste (3 → 6 → 9 zlata). Úroveň se aplikuje při instanciaci karty do souboje (`factory.ts`), engine ji drží per hráč (`PlayerState.levels`) — bot upgrady nemá.
 
-- **+statistiky** (např. +1 HP / +1 síla), nebo
-- **posílení schopnosti** (Damage 2 → 3, Odpočet 3 → 2, Heal 1 → 2), nebo
-- na vyšší úrovni **odemknutí druhé schopnosti**.
+Proč „na druh, ne na kopii": jednodušší datový model (balíček zůstává `string[]`), čitelnější UI a pořád platí ten správný trade-off — zlato do vylepšení = zlato, které nemáš na šířku balíčku.
 
-Pravidlo: upgrade má být **volba, ne samozřejmost** — do jedné karty investuješ zlato, které pak nemáš na šířku balíčku. Tenhle tah/šířka trade-off je jádro deckbuilderů.
+**Budoucí rozšíření** (až bude potřeba hloubka):
+- **posílení schopnosti** (Damage 2 → 3, Odpočet 3 → 2, Heal 1 → 2),
+- na vyšší úrovni **odemknutí druhé schopnosti**,
+- případně upgrade jednotlivé kopie (tall build) vedle druhového.
+
+Pravidlo: upgrade je **volba, ne samozřejmost** — investice do síly vs. do šířky balíčku. Tenhle trade-off je jádro deckbuilderů.
 
 ---
 
