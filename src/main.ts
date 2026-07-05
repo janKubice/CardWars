@@ -1,7 +1,7 @@
 import './style.css';
 import type { CardInstance, PlayerId, Position } from './engine/index.ts';
 import { GameEngine, key } from './engine/index.ts';
-import { botTakeTurn } from './ai/bot.ts';
+import { stepBot } from './ai/bot.ts';
 import { LIBRARY } from './content/cards.ts';
 import { describeCard, describeDef, describeAbility } from './ui/describe.ts';
 import { t, cardName, formatLog, getLang, setLang, type Lang } from './i18n/index.ts';
@@ -27,6 +27,71 @@ const app = document.getElementById('app') as HTMLDivElement;
 const randomSeed = () => Math.floor(Math.random() * 1e9);
 const rarityOf = (defId: string) => LIBRARY[defId].rarity;
 
+const CARD_ART: Record<string, string> = {
+  queen: '👑', recruit: '⚔️', spearman: '🔱', archer: '🏹', medic: '➕', wall: '🧱',
+  minelayer: '💣', reaper: '🌾', protector: '🛡️', berserk: '😡', courier: '✉️', vengetree: '🌳',
+  runeshield: '🔷', avenger: '🗡️', timebomb: '🧨', cannon: '💥', pyro: '🔥', commander: '🎖️',
+  banner: '🚩', zealot: '🙏', healer: '💚', zapper: '⚡', slinger: '🪨', squire: '🪖',
+  brute: '👊', scout: '👁️', shover: '🤚', sapper: '🧨', cleric: '✝️', hexer: '🔮',
+  sniper: '🎯', bouncer: '🚪', silencer: '🤫', summoner: '🌀', warlord: '🎗️', plague: '🐦‍⬛',
+  archmage: '🧙', titan: '🗿',
+};
+const cardArt = (defId: string) => CARD_ART[defId] ?? '❔';
+
+// vrstva pro efekty (plovoucí čísla, záblesky) — přežívá překreslení #app
+const fx = document.createElement('div');
+fx.id = 'fx';
+document.body.appendChild(fx);
+let renderedUids = new Set<number>(); // pro animaci "vyložení" jen u nových karet
+
+// ── animační pomůcky ────────────────────────────────────────────────────────
+interface Snap { row: number; col: number; hp: number; maxHp: number; }
+function snapshot(engine: GameEngine): Map<number, Snap> {
+  const m = new Map<number, Snap>();
+  for (const c of engine.state.cards.values()) {
+    if (c.zone === 'board' && c.pos) m.set(c.uid, { row: c.pos.row, col: c.pos.col, hp: c.hp, maxHp: c.maxHp });
+  }
+  return m;
+}
+function cellRect(row: number, col: number): DOMRect | null {
+  const el = app.querySelector(`.cell[data-cell="${row},${col}"]`);
+  return el ? el.getBoundingClientRect() : null;
+}
+function flashCard(uid: number, cls: string): void {
+  const el = app.querySelector(`.pc[data-uid="${uid}"]`);
+  if (el) el.classList.add(cls);
+}
+function floatText(row: number, col: number, text: string, cls: string): void {
+  const r = cellRect(row, col);
+  if (!r) return;
+  const d = document.createElement('div');
+  d.className = `fxfloat ${cls}`;
+  d.textContent = text;
+  d.style.left = `${r.left + r.width / 2}px`;
+  d.style.top = `${r.top + r.height / 2}px`;
+  fx.appendChild(d);
+  window.setTimeout(() => d.remove(), 950);
+}
+function burstAt(row: number, col: number, cls: string, glyph: string): void {
+  const r = cellRect(row, col);
+  if (!r) return;
+  const d = document.createElement('div');
+  d.className = `fxburst ${cls}`;
+  d.textContent = glyph;
+  d.style.left = `${r.left + r.width / 2}px`;
+  d.style.top = `${r.top + r.height / 2}px`;
+  fx.appendChild(d);
+  window.setTimeout(() => d.remove(), 650);
+}
+function animateDiff(before: Map<number, Snap>, after: Map<number, Snap>): void {
+  for (const [uid, b] of before) {
+    const a = after.get(uid);
+    if (!a) { burstAt(b.row, b.col, 'death', '💥'); continue; }
+    if (a.hp < b.hp) { flashCard(uid, 'hit'); floatText(a.row, a.col, `-${b.hp - a.hp}`, 'dmg'); }
+    else if (a.hp > b.hp) { flashCard(uid, 'healed'); floatText(a.row, a.col, `+${a.hp - b.hp}`, 'heal'); }
+  }
+}
+
 // ── přechody ────────────────────────────────────────────────────────────────
 function startRun(): void { run = createRun(randomSeed()); battle = null; screen = 'run'; render(); }
 function toMenu(): void { screen = 'menu'; run = null; battle = null; render(); }
@@ -34,6 +99,7 @@ function enterBattle(): void {
   if (!run) return;
   startBattle(run);
   battle = { engine: new GameEngine(makeBattleConfig(run)), selection: null, botPending: false };
+  renderedUids = new Set(); // nová bitva → karty se "dealnou"
   render();
 }
 function afterBattle(): void {
@@ -69,16 +135,18 @@ function badges(c: CardInstance): string {
   return b.length ? `<div class="bdgs">${b.join('')}</div>` : '';
 }
 function pieceCard(c: CardInstance, extra: string): string {
-  const cls = ['pc', c.owner === 'A' ? 'pc--a' : 'pc--b', c.isQueen ? 'pc--queen' : '', `r-${rarityOf(c.defId)}`, extra]
+  const enter = renderedUids.has(c.uid) ? '' : 'enter';
+  const cls = ['pc', c.owner === 'A' ? 'pc--a' : 'pc--b', c.isQueen ? 'pc--queen' : '', `r-${rarityOf(c.defId)}`, enter, extra]
     .filter(Boolean).join(' ');
   const abil = c.abilities.length ? '<span class="dot">✦</span>' : '';
   const title = describeCard(c) || cardName(c.defId);
   const atkCls = c.attack > c.baseAttack ? 'atk buffed' : 'atk';
-  return `<div class="${cls}" title="${escapeAttr(cardName(c.defId) + (title ? ' — ' + title : ''))}">
+  return `<div class="${cls}" data-uid="${c.uid}" title="${escapeAttr(cardName(c.defId) + (title ? ' — ' + title : ''))}">
       ${c.isQueen ? '<span class="crown">♛</span>' : ''}
       <div class="pc__name">${escapeHtml(cardName(c.defId))}${abil}</div>
+      <div class="pc__art">${cardArt(c.defId)}</div>
       ${badges(c)}
-      <div class="pc__foot"><span class="${atkCls}">${c.attack}</span><span class="hp">${Math.max(0, c.hp)}</span></div>
+      <div class="pc__foot"><span class="${atkCls}">${c.attack}</span><span class="hp">${Math.max(0, c.hp)}/${c.maxHp}</span></div>
     </div>`;
 }
 
@@ -145,7 +213,8 @@ function renderHand(b: BattleState): string {
     return `<div class="hcard r-${rarityOf(c.defId)} ${sel} ${aff}" data-hand="${c.uid}" title="${escapeAttr(describeCard(c) || cardName(c.defId))}">
         <span class="hcard__cost">${c.cost}</span>
         <div class="hcard__name">${escapeHtml(cardName(c.defId))}</div>
-        <div class="hcard__foot"><span class="atk">${c.attack}</span><span class="hp">${c.hp}</span>${c.range > 1 ? `<span class="rng">🏹${c.range}</span>` : ''}</div>
+        <div class="hcard__art">${cardArt(c.defId)}</div>
+        <div class="hcard__foot"><span class="atk">${c.attack}</span><span class="hp">${c.hp}/${c.maxHp}</span>${c.range > 1 ? `<span class="rng">🏹${c.range}</span>` : ''}</div>
       </div>`;
   }).join('');
   return `<div class="hand">${chips || `<div class="empty">—</div>`}</div>`;
@@ -290,6 +359,14 @@ function render(): void {
   else if (battle) body = renderBattle(battle);
   else body = renderShop();
   app.innerHTML = body;
+  // po vykreslení si zapamatuj karty na desce (aby "enter" animace hrála jen u nových)
+  if (battle) {
+    const now = new Set<number>();
+    for (const c of battle.engine.state.cards.values()) if (c.zone === 'board') now.add(c.uid);
+    renderedUids = now;
+  } else {
+    renderedUids = new Set();
+  }
 }
 
 // ── interakce v souboji ─────────────────────────────────────────────────────
@@ -302,32 +379,76 @@ function trySelectBoard(b: BattleState, uid: number | null): void {
 function handleCell(b: BattleState, pos: Position): void {
   const uid = b.engine.state.grid[pos.row][pos.col];
   if (pendingActive != null) {
-    if (uid != null && b.engine.activeTargets(pendingActive).includes(uid)) b.engine.activate(pendingActive, uid);
+    const src = pendingActive;
     pendingActive = null;
     b.selection = null;
-    render();
+    if (uid != null && b.engine.activeTargets(src).includes(uid)) withFx(b, () => b.engine.activate(src, uid), src);
+    else render();
     return;
   }
   if (b.selection?.type === 'hand') {
-    if (legalCells(b).has(key(pos))) b.engine.play(b.selection.uid, pos);
+    const cardUid = b.selection.uid;
     b.selection = null;
-  } else if (b.selection?.type === 'board') {
-    if (uid != null && attackTargets(b).has(uid)) { b.engine.attack(b.selection.uid, uid); b.selection = null; }
-    else trySelectBoard(b, uid);
-  } else trySelectBoard(b, uid);
+    if (legalCells(b).has(key(pos))) withFx(b, () => b.engine.play(cardUid, pos));
+    else render();
+    return;
+  }
+  if (b.selection?.type === 'board') {
+    const attacker = b.selection.uid;
+    if (uid != null && attackTargets(b).has(uid)) {
+      b.selection = null;
+      withFx(b, () => b.engine.attack(attacker, uid), attacker);
+      return;
+    }
+    trySelectBoard(b, uid);
+    render();
+    return;
+  }
+  trySelectBoard(b, uid);
   render();
 }
+/** Provede akci hráče, překreslí a přehraje efekty (plovoucí čísla, záblesky). */
+function withFx(b: BattleState, action: () => void, acting?: number): void {
+  const before = snapshot(b.engine);
+  action();
+  render();
+  if (acting != null) flashCard(acting, 'acting');
+  animateDiff(before, snapshot(b.engine));
+}
+
 function endTurn(b: BattleState): void {
   if (b.engine.active !== HUMAN || b.engine.winner) return;
   b.selection = null;
   pendingActive = null;
-  b.engine.endTurn();
+  b.engine.endTurn(); // předá tah botovi (jeho úsvit proběhne hned)
+  runBotTurn(b);
+}
+
+function runBotTurn(b: BattleState): void {
+  b.botPending = true;
   render();
-  if (!b.engine.winner && b.engine.active !== HUMAN) {
-    b.botPending = true;
+  window.setTimeout(() => botStep(b), 600);
+}
+
+/** Jeden krok bota: jedna akce, překreslení, efekty, pak naplánuj další. */
+function botStep(b: BattleState): void {
+  if (b !== battle) return; // hra se mezitím změnila
+  const eng = b.engine;
+  if (eng.winner) { b.botPending = false; render(); return; }
+  const before = snapshot(eng);
+  const action = stepBot(eng);
+  if (action === null) {
+    eng.endTurn(); // konec tahu bota → zpět na hráče
+    b.botPending = false;
     render();
-    window.setTimeout(() => { botTakeTurn(b.engine); b.botPending = false; render(); }, 450);
+    return;
   }
+  render();
+  const acting = action.kind === 'attack' ? action.attacker : action.kind === 'activate' ? action.card : undefined;
+  if (acting != null) flashCard(acting, 'acting');
+  animateDiff(before, snapshot(eng));
+  if (eng.winner) { b.botPending = false; render(); return; }
+  window.setTimeout(() => botStep(b), 650);
 }
 
 // ── delegace kliknutí ───────────────────────────────────────────────────────
@@ -354,7 +475,7 @@ function handleAction(action: string, el: HTMLElement): void {
       const uid = Number(el.dataset.uid);
       const ab = battle.engine.activeAbility(uid);
       if (ab && ab.target === 'chosen') { pendingActive = uid; render(); }
-      else { battle.engine.activate(uid); pendingActive = null; battle.selection = null; render(); }
+      else { const b = battle; b.selection = null; withFx(b, () => b.engine.activate(uid), uid); }
       break;
     }
     case 'cancelactive': pendingActive = null; if (battle) battle.selection = null; render(); break;

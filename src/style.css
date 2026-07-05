@@ -140,9 +140,10 @@ button:disabled { opacity: .4; cursor: not-allowed; }
 .pc.is-sel { box-shadow: 0 0 0 3px var(--gold), 0 0 16px rgba(242,193,78,.6); z-index: 3; }
 .pc.is-tgt { box-shadow: 0 0 0 3px var(--b), 0 0 16px rgba(255,95,110,.6); animation: breathe 1s ease-in-out infinite; z-index: 3; }
 .pc.is-act { box-shadow: 0 0 0 3px #47d6ff, 0 0 16px rgba(71,214,255,.55); animation: breathe 1s ease-in-out infinite; z-index: 3; }
-.pc__name { font-weight: 700; font-size: 10px; line-height: 1.05; text-shadow: 0 1px 2px rgba(0,0,0,.6); }
+.pc__name { font-weight: 700; font-size: 9.5px; line-height: 1.05; text-shadow: 0 1px 2px rgba(0,0,0,.6); }
 .pc__name .dot { color: var(--gold); margin-left: 2px; }
-.pc__foot { display: flex; justify-content: space-between; align-items: flex-end; font-size: 12px; }
+.pc__art { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; font-size: 24px; line-height: 1; filter: drop-shadow(0 1px 2px rgba(0,0,0,.55)); }
+.pc__foot { display: flex; justify-content: space-between; align-items: flex-end; font-size: 11px; }
 .crown { position: absolute; top: 1px; right: 3px; color: var(--gold); font-size: 12px; text-shadow: 0 1px 2px #000; }
 .atk, .hp {
   display: inline-flex; align-items: center; justify-content: center;
@@ -174,8 +175,9 @@ button:disabled { opacity: .4; cursor: not-allowed; }
   display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 13px;
   box-shadow: 0 2px 6px rgba(0,0,0,.4);
 }
-.hcard__name { font-weight: 700; font-size: 12px; margin: 2px 0 6px; }
-.hcard__foot { display: flex; gap: 8px; font-size: 13px; font-weight: 800; }
+.hcard__name { font-weight: 700; font-size: 12px; margin: 2px 0 2px; }
+.hcard__art { font-size: 24px; text-align: center; margin: 2px 0 4px; filter: drop-shadow(0 1px 2px rgba(0,0,0,.5)); }
+.hcard__foot { display: flex; gap: 6px; font-size: 12px; font-weight: 800; }
 .empty { color: var(--muted); padding: 24px; }
 
 /* ── ovládání ── */
@@ -246,6 +248,48 @@ button.mini.up { background: #1c4a2e; border-color: #2e6b45; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 @keyframes popIn { from { opacity: 0; transform: scale(.94); } to { opacity: 1; transform: scale(1); } }
 @keyframes breathe { 0%,100% { filter: brightness(1); } 50% { filter: brightness(1.35); } }
+
+/* ── efektová vrstva (plovoucí čísla, záblesky) ── */
+#fx { position: fixed; inset: 0; pointer-events: none; z-index: 60; overflow: hidden; }
+.fxfloat {
+  position: fixed; transform: translate(-50%, -50%); font-weight: 900; font-size: 20px;
+  text-shadow: 0 2px 4px #000, 0 0 6px rgba(0,0,0,.6); animation: floatUp .95s ease-out forwards;
+}
+.fxfloat.dmg { color: #ff6470; }
+.fxfloat.heal { color: #6ee7a0; }
+@keyframes floatUp {
+  0% { opacity: 0; transform: translate(-50%, -25%) scale(.6); }
+  20% { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, -165%) scale(1.15); }
+}
+.fxburst { position: fixed; transform: translate(-50%, -50%); font-size: 30px; animation: burst .62s ease-out forwards; }
+@keyframes burst {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(.4); }
+  30% { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.9) rotate(12deg); }
+}
+
+/* ── animace karet ── */
+.pc.enter { animation: dealIn .34s cubic-bezier(.2, 1.5, .4, 1); }
+@keyframes dealIn {
+  0% { opacity: 0; transform: translateY(-45%) scale(.5) rotate(-8deg); }
+  100% { opacity: 1; transform: none; }
+}
+.pc.hit { animation: hitShake .3s; }
+@keyframes hitShake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-3px); } 40% { transform: translateX(3px); }
+  60% { transform: translateX(-2px); } 80% { transform: translateX(2px); }
+}
+.pc.hit::after, .pc.healed::after {
+  content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  animation: flashFade .4s forwards;
+}
+.pc.hit::after { background: rgba(255,60,70,.55); }
+.pc.healed::after { background: rgba(80,230,140,.45); }
+@keyframes flashFade { from { opacity: 1; } to { opacity: 0; } }
+.pc.acting { animation: lunge .34s ease; box-shadow: 0 0 0 3px var(--gold), 0 0 18px rgba(242,193,78,.7) !important; z-index: 5; }
+@keyframes lunge { 0% { transform: scale(1); } 40% { transform: scale(1.16); } 100% { transform: scale(1); } }
 
 @media (max-width: 560px) {
   .logo--big { font-size: 44px; }

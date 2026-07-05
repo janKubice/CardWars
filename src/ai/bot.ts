@@ -55,41 +55,50 @@ type Move =
   | { kind: 'play'; card: number; pos: Position; score: number }
   | { kind: 'activate'; card: number; target?: number; score: number };
 
-/** Odehraje celý tah aktivního (botího) hráče a ukončí ho. */
-export function botTakeTurn(engine: GameEngine): void {
+/** Popis jedné provedené botí akce (pro animace v UI). */
+export type BotAction =
+  | { kind: 'attack'; attacker: number; target: number }
+  | { kind: 'play'; card: number; pos: Position }
+  | { kind: 'activate'; card: number; target?: number };
+
+/** Spočítá a PROVEDE jednu nejlepší akci bota. Vrátí co udělal, nebo null (konec tahu). */
+export function stepBot(engine: GameEngine): BotAction | null {
   const me = engine.active;
+  let best: Move | null = null;
+
+  for (const attacker of engine.boardCardsOf(me)) {
+    for (const targetUid of engine.legalAttackTargets(attacker.uid)) {
+      const target = engine.card(targetUid);
+      if (!target) continue;
+      const score = scoreAttack(attacker, target);
+      if (!best || score > best.score) best = { kind: 'attack', attacker: attacker.uid, target: targetUid, score };
+    }
+  }
+  for (const card of engine.handOf(me)) {
+    const placements = engine.legalPlacements(card.uid);
+    if (placements.length === 0) continue;
+    const pos = bestPlacement(engine, me, placements);
+    const score = scorePlay(engine, card, pos, me);
+    if (!best || score > best.score) best = { kind: 'play', card: card.uid, pos, score };
+  }
+  for (const c of engine.boardCardsOf(me)) {
+    if (!engine.canActivate(c.uid)) continue;
+    const m = scoreActivate(engine, c.uid);
+    if (m && (!best || m.score > best.score)) best = m;
+  }
+
+  if (!best || best.score <= 0) return null;
+  if (best.kind === 'attack') { engine.attack(best.attacker, best.target); return { kind: 'attack', attacker: best.attacker, target: best.target }; }
+  if (best.kind === 'play') { engine.play(best.card, best.pos); return { kind: 'play', card: best.card, pos: best.pos }; }
+  engine.activate(best.card, best.target);
+  return { kind: 'activate', card: best.card, target: best.target };
+}
+
+/** Odehraje celý tah aktivního (botího) hráče a ukončí ho (pro headless testy). */
+export function botTakeTurn(engine: GameEngine): void {
   let guard = 0;
   while (!engine.winner && guard++ < 60) {
-    let best: Move | null = null;
-
-    for (const attacker of engine.boardCardsOf(me)) {
-      for (const targetUid of engine.legalAttackTargets(attacker.uid)) {
-        const target = engine.card(targetUid);
-        if (!target) continue;
-        const score = scoreAttack(attacker, target);
-        if (!best || score > best.score) best = { kind: 'attack', attacker: attacker.uid, target: targetUid, score };
-      }
-    }
-
-    for (const card of engine.handOf(me)) {
-      const placements = engine.legalPlacements(card.uid);
-      if (placements.length === 0) continue;
-      const pos = bestPlacement(engine, me, placements);
-      const score = scorePlay(engine, card, pos, me);
-      if (!best || score > best.score) best = { kind: 'play', card: card.uid, pos, score };
-    }
-
-    for (const c of engine.boardCardsOf(me)) {
-      if (!engine.canActivate(c.uid)) continue;
-      const m = scoreActivate(engine, c.uid);
-      if (m && (!best || m.score > best.score)) best = m;
-    }
-
-    if (!best || best.score <= 0) break;
-
-    if (best.kind === 'attack') engine.attack(best.attacker, best.target);
-    else if (best.kind === 'play') engine.play(best.card, best.pos);
-    else engine.activate(best.card, best.target);
+    if (stepBot(engine) === null) break;
   }
   engine.endTurn();
 }
