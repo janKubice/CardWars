@@ -1,5 +1,6 @@
 import framesUrl from '../../assets/Modular_Fantasy_Cards_Spritesheet.png';
 import iconsUrl from '../../assets/pixelCardAssest_V01.png';
+import homeUrl from '../../assets/01_TravelBookLite/Sprites/UI_TravelBook_IconHome01a.png';
 import type { PlayerId } from '../engine/index.ts';
 
 // Nařezání spritesheetů na jednotlivé PNG (data URI) za běhu přes canvas.
@@ -44,7 +45,7 @@ const ART_MAP: Record<string, string> = {
   wall: 'shieldBronze', minelayer: 'axe', reaper: 'axe', protector: 'shieldBlue', berserk: 'axe',
   courier: 'coin', vengetree: 'potionG', runeshield: 'shieldPurple', avenger: 'swordSteel',
   timebomb: 'wandRed', cannon: 'hammer', pyro: 'wandRed', commander: 'shieldBronze', banner: 'shieldGreen',
-  zealot: 'swordWood', healer: 'potionR', zapper: 'wandGreen', slinger: 'swordWood', squire: 'shieldBronze',
+  zealot: 'swordWood', healer: 'potionR', zapper: 'wandGreen', slinger: 'bow', squire: 'shieldBronze',
   brute: 'hammer', scout: 'bow', shover: 'shieldBlue', sapper: 'axe', cleric: 'potionR', hexer: 'wandRed',
   sniper: 'bow', bouncer: 'shieldGreen', silencer: 'wandGreen', summoner: 'wandGreen', warlord: 'swordSteel',
   plague: 'potionY', archmage: 'shieldPurple', titan: 'hammer',
@@ -77,6 +78,8 @@ export async function initSprites(): Promise<void> {
   const [framesImg, iconsImg] = await Promise.all([load(framesUrl), load(iconsUrl)]);
   if (framesImg) for (const [name, [x, y]] of Object.entries(FRAME_SRC)) frames[name] = slice(framesImg, x, y, FW, FH);
   if (iconsImg) for (const [name, [x, y, w, h]] of Object.entries(ICON_SRC)) icons[name] = slice(iconsImg, x, y, w, h);
+  // UI kit ikony → CSS proměnné
+  document.documentElement.style.setProperty('--ic-home', `url(${homeUrl})`);
 }
 
 /** Rámeček karty podle vlastníka (Královna zlatý). */

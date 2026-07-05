@@ -99,6 +99,24 @@ function animateDiff(before: Map<number, Snap>, after: Map<number, Snap>): void 
   }
 }
 
+// útočník se rozmáchne směrem k cíli
+function lungeAttack(eng: GameEngine, before: Map<number, Snap>, attacker: number, target: number): void {
+  const a = eng.card(attacker);
+  const tp = before.get(target);
+  if (!a?.pos || !tp) return;
+  const dx = Math.sign(tp.col - a.pos.col) * 12;
+  const dy = Math.sign(tp.row - a.pos.row) * 12;
+  const el = app.querySelector(`.pc[data-uid="${attacker}"]`) as HTMLElement | null;
+  if (el) { el.style.setProperty('--lx', `${dx}px`); el.style.setProperty('--ly', `${dy}px`); el.classList.add('lunge-move'); }
+}
+
+type Fx = { kind: 'attack'; attacker: number; target: number } | { kind: 'act'; card: number } | undefined;
+function applyFx(b: BattleState, before: Map<number, Snap>, fx: Fx): void {
+  if (fx?.kind === 'attack') lungeAttack(b.engine, before, fx.attacker, fx.target);
+  else if (fx?.kind === 'act') flashCard(fx.card, 'acting');
+  animateDiff(before, snapshot(b.engine));
+}
+
 // ── přechody ────────────────────────────────────────────────────────────────
 function startRun(): void { run = createRun(randomSeed()); battle = null; screen = 'run'; render(); }
 function toMenu(): void { screen = 'menu'; run = null; battle = null; render(); }
@@ -163,7 +181,7 @@ function pieceCard(c: CardInstance, extra: string): string {
 // ── LANG BAR (nahoře na všech obrazovkách) ──────────────────────────────────
 function langBar(withHome: boolean): string {
   const l = getLang();
-  const home = withHome ? `<button class="ghost sm" data-action="home" title="Menu">⌂</button>` : '';
+  const home = withHome ? `<button class="ghost sm" data-action="home" title="Menu"><span class="ic ic-home"></span></button>` : '';
   return `<div class="langbar">
       ${home}
       <div class="langtoggle">
@@ -398,7 +416,7 @@ function handleCell(b: BattleState, pos: Position): void {
     const src = pendingActive;
     pendingActive = null;
     b.selection = null;
-    if (uid != null && b.engine.activeTargets(src).includes(uid)) withFx(b, () => b.engine.activate(src, uid), src);
+    if (uid != null && b.engine.activeTargets(src).includes(uid)) withFx(b, () => b.engine.activate(src, uid), { kind: 'act', card: src });
     else render();
     return;
   }
@@ -413,8 +431,9 @@ function handleCell(b: BattleState, pos: Position): void {
   if (b.selection?.type === 'board') {
     const attacker = b.selection.uid;
     if (uid != null && attackTargets(b).has(uid)) {
+      const tgt = uid;
       b.selection = null;
-      withFx(b, () => b.engine.attack(attacker, uid), attacker);
+      withFx(b, () => b.engine.attack(attacker, tgt), { kind: 'attack', attacker, target: tgt });
       return;
     }
     trySelectBoard(b, uid);
@@ -424,13 +443,12 @@ function handleCell(b: BattleState, pos: Position): void {
   trySelectBoard(b, uid);
   render();
 }
-/** Provede akci hráče, překreslí a přehraje efekty (plovoucí čísla, záblesky). */
-function withFx(b: BattleState, action: () => void, acting?: number): void {
+/** Provede akci hráče, překreslí a přehraje efekty (plovoucí čísla, záblesky, výpad). */
+function withFx(b: BattleState, action: () => void, fx?: Fx): void {
   const before = snapshot(b.engine);
   action();
   render();
-  if (acting != null) flashCard(acting, 'acting');
-  animateDiff(before, snapshot(b.engine));
+  applyFx(b, before, fx);
 }
 
 function endTurn(b: BattleState): void {
@@ -461,9 +479,9 @@ function botStep(b: BattleState): void {
     return;
   }
   render();
-  const acting = action.kind === 'attack' ? action.attacker : action.kind === 'activate' ? action.card : undefined;
-  if (acting != null) flashCard(acting, 'acting');
-  animateDiff(before, snapshot(eng));
+  const fx: Fx = action.kind === 'attack' ? { kind: 'attack', attacker: action.attacker, target: action.target }
+    : action.kind === 'activate' ? { kind: 'act', card: action.card } : undefined;
+  applyFx(b, before, fx);
   if (eng.winner) { b.botPending = false; render(); return; }
   window.setTimeout(() => botStep(b), 650);
 }
@@ -492,7 +510,7 @@ function handleAction(action: string, el: HTMLElement): void {
       const uid = Number(el.dataset.uid);
       const ab = battle.engine.activeAbility(uid);
       if (ab && ab.target === 'chosen') { pendingActive = uid; render(); }
-      else { const b = battle; b.selection = null; withFx(b, () => b.engine.activate(uid), uid); }
+      else { const b = battle; b.selection = null; withFx(b, () => b.engine.activate(uid), { kind: 'act', card: uid }); }
       break;
     }
     case 'cancelactive': pendingActive = null; if (battle) battle.selection = null; render(); break;
