@@ -128,6 +128,7 @@ const cs: Dict = {
   'log.unknownTarget': '⚠️ neznámý cíl {name}', 'log.unknownEffect': '⚠️ neznámý efekt {name}',
   'log.activate': '✨ {card} použil schopnost',
   'log.bounce': '↩️ {card} vrácen do ruky', 'log.silence': '🔇 {card} umlčen',
+  'log.reshuffle': '🔀 {owner} zamíchal odhoz zpět do balíčku',
   // card names
   'card.queen': 'Královna', 'card.recruit': 'Rekrut', 'card.spearman': 'Kopiník', 'card.archer': 'Lučištník',
   'card.medic': 'Zdravotník', 'card.wall': 'Křeček-zeď', 'card.minelayer': 'Minér', 'card.reaper': 'Kosec',
@@ -207,6 +208,7 @@ const en: Dict = {
   'log.unknownTarget': '⚠️ unknown target {name}', 'log.unknownEffect': '⚠️ unknown effect {name}',
   'log.activate': '✨ {card} used its ability',
   'log.bounce': '↩️ {card} returned to hand', 'log.silence': '🔇 {card} silenced',
+  'log.reshuffle': '🔀 {owner} shuffled discard back into deck',
   'card.queen': 'Queen', 'card.recruit': 'Recruit', 'card.spearman': 'Spearman', 'card.archer': 'Archer',
   'card.medic': 'Medic', 'card.wall': 'Wall Hamster', 'card.minelayer': 'Minelayer', 'card.reaper': 'Reaper',
   'card.protector': 'Protector', 'card.berserk': 'Berserker', 'card.courier': 'Courier', 'card.vengetree': 'Vengeful Tree',

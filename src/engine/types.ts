@@ -78,6 +78,8 @@ export interface CardInstance {
   hasAttacked: boolean;
   justPlayed: boolean;
   activeUsed: boolean;
+  /** pochází z balíčku (po zničení se recykluje do odhozu); tokeny ne */
+  fromDeck: boolean;
   counters: Record<string, number>;
   abilities: AbilityDef[];
   keywords: string[];
@@ -97,6 +99,8 @@ export interface PlayerState {
   homeEdge: Edge;
   hand: number[];
   deck: string[];
+  /** odhoz (padlé/zahozené karty) — recykluje se zpět do balíčku, když dojde */
+  discard: string[];
   handLimit: number;
   /** kolikrát hráč tahal z prázdného balíčku (roste zranění únavou) */
   fatigue: number;

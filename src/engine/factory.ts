@@ -13,6 +13,7 @@ export function instantiate(
   defId: string,
   owner: PlayerId,
   zone: 'hand' | 'board' = 'hand',
+  fromDeck = false,
 ): CardInstance {
   const def: CardDef | undefined = state.library[defId];
   if (!def) throw new Error(`Neznámá karta '${defId}'`);
@@ -48,6 +49,7 @@ export function instantiate(
     hasAttacked: false,
     justPlayed: false,
     activeUsed: false,
+    fromDeck,
     counters,
     abilities,
     keywords: [...(def.keywords ?? [])],

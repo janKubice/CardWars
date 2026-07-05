@@ -28,6 +28,10 @@ export interface ActionResult {
   error?: string;
 }
 
+// Od tohoto tahu (počítá se za oba hráče) začíná „sudden death" — každému
+// hráči na tahu ubývá Královna rostoucí únavou, aby partie vždy skončila.
+const SUDDEN_DEATH_TURN = 50;
+
 const OK: ActionResult = { ok: true };
 function fail(error: string): ActionResult {
   return { ok: false, error };
@@ -264,8 +268,12 @@ export class GameEngine {
     for (const uid of exploded) this.runner.enqueue({ type: 'destroy', uid, reason: 'exploded' });
     this.runner.drain();
 
-    // Dobírání — nebo únava, když je balíček prázdný (zaručuje konec hry).
-    if (p.deck.length === 0) {
+    // Dobírání s recyklací odhozu (hráč nezůstane bez karet, pokud nějaké má).
+    const drew = drawCards(s, player, 1);
+
+    // Únava: sudden-death po dlouhé partii, nebo když opravdu žádné karty nezbývají.
+    const trulyOut = drew === 0 && p.hand.length === 0;
+    if (s.turnNumber >= SUDDEN_DEATH_TURN || trulyOut) {
       p.fatigue += 1;
       const queen = mine.find((c) => c.isQueen);
       if (queen) {
@@ -273,8 +281,6 @@ export class GameEngine {
         this.runner.enqueue({ type: 'damage', uid: queen.uid, amount: p.fatigue });
         this.runner.drain();
       }
-    } else {
-      drawCards(s, player, 1);
     }
     pushLog(s, 'turn', { n: s.turnNumber, owner: player, e: p.energy, m: p.maxEnergy });
   }
@@ -318,8 +324,8 @@ function createInitialState(config: GameConfig): GameState {
     grid,
     cards: new Map(),
     players: {
-      A: { id: 'A', energy: 0, maxEnergy: 0, homeEdge: 'bottom', hand: [], deck: [], handLimit, fatigue: 0, levels: config.levels?.A ?? {} },
-      B: { id: 'B', energy: 0, maxEnergy: 0, homeEdge: 'top', hand: [], deck: [], handLimit, fatigue: 0, levels: config.levels?.B ?? {} },
+      A: { id: 'A', energy: 0, maxEnergy: 0, homeEdge: 'bottom', hand: [], deck: [], discard: [], handLimit, fatigue: 0, levels: config.levels?.A ?? {} },
+      B: { id: 'B', energy: 0, maxEnergy: 0, homeEdge: 'top', hand: [], deck: [], discard: [], handLimit, fatigue: 0, levels: config.levels?.B ?? {} },
     },
     active: 'A',
     turnNumber: 0,

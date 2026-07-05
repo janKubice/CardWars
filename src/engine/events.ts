@@ -4,7 +4,7 @@ import { placeOnGrid, removeFromGrid, isEmpty, inBounds, key } from './board.ts'
 import { getEffect, getTarget } from './registries.ts';
 import type { TriggerData } from './registries.ts';
 import { instantiate, opponent } from './factory.ts';
-import { nextInt } from './rng.ts';
+import { nextInt, shuffleInPlace } from './rng.ts';
 import { pushLog } from './log.ts';
 import { recomputeAuras } from './auras.ts';
 
@@ -155,6 +155,8 @@ export class EffectRunner {
     if (c.pos) removeFromGrid(this.state, c.pos);
     const deadPos = c.pos;
     c.pos = null;
+    // karta z balíčku se recykluje do odhozu (tokeny/Královna ne)
+    if (c.fromDeck && !c.isQueen) this.state.players[c.owner].discard.push(c.defId);
     pushLog(this.state, 'destroy', { card: c.defId });
 
     // Skon (deathrattle)
@@ -241,7 +243,10 @@ export class EffectRunner {
         const uid = p.hand[idx];
         p.hand.splice(idx, 1);
         const c = state.cards.get(uid);
-        if (c) c.zone = 'dead';
+        if (c) {
+          c.zone = 'dead';
+          if (c.fromDeck) state.players[owner].discard.push(c.defId); // recykluje se
+        }
         pushLog(state, 'discard', { owner, card: c?.defId ?? 'queen' });
       },
       draw(owner, count) {
@@ -297,18 +302,33 @@ export class EffectRunner {
   }
 }
 
-/** Dobírání karet z balíčku do ruky (respektuje limit — přebytek se pálí). */
-export function drawCards(state: GameState, owner: PlayerId, count: number): void {
+/**
+ * Dobírání karet do ruky. Když je balíček prázdný, zamíchá se odhoz zpět
+ * (recyklace) — hráč tak nikdy neuvázne bez karet, pokud nějaké má v odhozu.
+ * Vrátí kolik karet se reálně dobralo (0 = opravdu žádné karty nezbývají).
+ */
+export function drawCards(state: GameState, owner: PlayerId, count: number): number {
   const p = state.players[owner];
+  let drawn = 0;
   for (let i = 0; i < count; i++) {
+    if (p.deck.length === 0) {
+      if (p.discard.length === 0) break; // opravdu nic (vše na desce/v ruce)
+      p.deck = p.discard;
+      p.discard = [];
+      shuffleInPlace(p.deck, state.rng);
+      pushLog(state, 'reshuffle', { owner });
+    }
     const defId = p.deck.shift();
-    if (!defId) return; // prázdný balíček — MVP bez únavy
-    const inst = instantiate(state, defId, owner, 'hand');
+    if (!defId) break;
+    const inst = instantiate(state, defId, owner, 'hand', true);
+    drawn++;
     if (p.hand.length >= p.handLimit) {
       inst.zone = 'dead';
+      p.discard.push(inst.defId); // spálená karta se recykluje
       pushLog(state, 'burn', { card: inst.defId });
       continue;
     }
     p.hand.push(inst.uid);
   }
+  return drawn;
 }

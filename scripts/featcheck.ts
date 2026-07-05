@@ -1,7 +1,7 @@
 // Deterministický test aury a aktivních schopností na úrovni enginu.
 // Spuštění: node --experimental-strip-types scripts/featcheck.ts
 
-import { GameEngine, EffectRunner, getEffect, instantiate, placeOnGrid, recomputeAuras } from '../src/engine/index.ts';
+import { GameEngine, EffectRunner, getEffect, instantiate, placeOnGrid, recomputeAuras, drawCards } from '../src/engine/index.ts';
 import { LIBRARY } from '../src/content/cards.ts';
 
 declare const process: { exit(code: number): never };
@@ -86,5 +86,23 @@ check('umlčovaný má před silence schopnost', victim.abilities.length > 0);
 e.activate(silencer.uid, victim.uid);
 check('silence odstraní schopnosti', victim.abilities.length === 0);
 
-console.log(failed === 0 ? '\nOK ✅ aura, aktivace, push, bounce i silence fungují.' : `\nCHYBA: ${failed} kontrol selhalo.`);
+// ── RECYKLACE ODHOZU: prázdný balíček se doplní z odhozu ──
+const pA = st.players.A;
+pA.deck = [];
+pA.discard = ['recruit', 'archer'];
+pA.hand = [];
+const drew = drawCards(st, 'A', 1);
+check('recyklace: dobral kartu z odhozu', drew === 1 && pA.hand.length === 1);
+check('recyklace: odhoz se přemíchal do balíčku', pA.deck.length === 1 && pA.discard.length === 0);
+
+// padlá karta z balíčku jde do odhozu (recykluje se)
+pA.discard = [];
+const rec2 = instantiate(st, 'recruit', 'A', 'board', true);
+placeOnGrid(st, rec2.uid, { row: 0, col: 6 });
+const runner2 = new EffectRunner(st);
+runner2.enqueue({ type: 'destroy', uid: rec2.uid });
+runner2.drain();
+check('padlá karta z balíčku jde do odhozu', pA.discard.includes('recruit'));
+
+console.log(failed === 0 ? '\nOK ✅ vše OK (aura, aktivace, efekty, recyklace odhozu).' : `\nCHYBA: ${failed} kontrol selhalo.`);
 if (failed > 0) process.exit(1);

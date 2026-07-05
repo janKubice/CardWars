@@ -26,3 +26,13 @@ export function pick<T>(rng: RngState, arr: readonly T[]): T | undefined {
   if (arr.length === 0) return undefined;
   return arr[nextInt(rng, arr.length)];
 }
+
+/** Zamíchá pole na místě (Fisher-Yates). */
+export function shuffleInPlace<T>(arr: T[], rng: RngState): void {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = nextInt(rng, i + 1);
+    const tmp = arr[i];
+    arr[i] = arr[j];
+    arr[j] = tmp;
+  }
+}
