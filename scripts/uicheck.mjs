@@ -51,19 +51,28 @@ const cells = await page.locator('.cell').count();
 const queens = await page.locator('.pc--queen').count();
 console.log(`souboj: buňky=${cells}, královny=${queens}`);
 
-// 5) Polož jednotku (během pár tahů)
+// 5) Polož jednotku (počítáme JEN karty na desce; ruka má taky .pc)
+async function waitHumanTurn() {
+  for (let i = 0; i < 40; i++) { if (!(await page.locator('button[data-action="endturn"]').isDisabled())) return; await page.waitForTimeout(200); }
+}
 let played = false;
-for (let round = 0; round < 5 && !played; round++) {
+for (let turn = 0; turn < 8 && !played; turn++) {
+  await waitHumanTurn();
   const aff = page.locator('.hslot:not(.is-dim)').first();
   if (await aff.count()) {
     await aff.click();
     const legal = page.locator('.cell.legal');
-    if (await legal.count()) { await legal.first().click(); played = true; break; }
+    if (await legal.count()) {
+      const before = await page.locator('.board .pc').count();
+      await legal.first().click();
+      await page.waitForTimeout(250);
+      if ((await page.locator('.board .pc').count()) > before) played = true;
+    }
   }
-  const end = page.locator('button[data-action="endturn"]');
-  if (!(await end.isDisabled())) { await end.click(); await page.waitForTimeout(650); }
+  if (!(await page.locator('button[data-action="endturn"]').isDisabled())) await page.locator('button[data-action="endturn"]').click();
+  await page.waitForTimeout(400);
 }
-console.log(`jednotka položena: ${played}`);
+console.log(`jednotka reálně položena na desku: ${played}`);
 await page.screenshot({ path: resolve(__dirname, '../dist/screenshot.png') });
 await browser.close();
 
@@ -71,5 +80,6 @@ if (cells !== 42) { console.error('CHYBA: nečekaný počet buněk'); process.ex
 if (queens !== 2) { console.error('CHYBA: nejsou 2 královny'); process.exit(1); }
 if (shopCards !== 5) { console.error('CHYBA: obchod nemá 5 karet'); process.exit(1); }
 if (!upgraded) { console.error('CHYBA: vylepšení karty se neprojevilo'); process.exit(1); }
+if (!played) { console.error('CHYBA: nešlo vyložit kartu na desku (regrese pokládání!)'); process.exit(1); }
 if (errors.length) { console.error('CHYBA konzole:', errors.slice(0, 5)); process.exit(1); }
 console.log('OK ✅ menu + jazyk + obchod + souboj fungují v prohlížeči.');

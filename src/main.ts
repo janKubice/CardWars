@@ -404,8 +404,9 @@ function handleCell(b: BattleState, pos: Position): void {
   }
   if (b.selection?.type === 'hand') {
     const cardUid = b.selection.uid;
+    const canPlay = legalCells(b).has(key(pos)); // POZOR: zjistit PŘED vynulováním výběru
     b.selection = null;
-    if (legalCells(b).has(key(pos))) withFx(b, () => b.engine.play(cardUid, pos));
+    if (canPlay) withFx(b, () => b.engine.play(cardUid, pos));
     else render();
     return;
   }
