@@ -5,6 +5,7 @@ export * from './directions.ts';
 export * from './registries.ts';
 export * from './events.ts';
 export * from './factory.ts';
+export * from './auras.ts';
 export * from './game.ts';
 export { makeRng, nextFloat, nextInt, pick } from './rng.ts';
 

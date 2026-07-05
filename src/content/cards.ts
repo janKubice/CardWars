@@ -65,7 +65,25 @@ export const CARD_DEFS: CardDef[] = [
   },
   {
     id: 'commander', name: 'Velitel', rarity: 'epic', cost: 5, hp: 5, attack: 2, range: 1,
-    abilities: [{ trigger: 'deploy', effect: 'buff', target: 'around', params: { atk: 1, side: 'ally' } }],
+    abilities: [{ trigger: 'aura', effect: 'buff', target: 'around', params: { atk: 1, side: 'ally' } }],
+  },
+
+  // ── Aury a aktivní schopnosti ──
+  {
+    id: 'banner', name: 'Válečná standarta', rarity: 'rare', cost: 3, hp: 4, attack: 0, range: 1,
+    abilities: [{ trigger: 'aura', effect: 'buff', target: 'around', params: { atk: 1, side: 'ally' } }],
+  },
+  {
+    id: 'zealot', name: 'Fanatik', rarity: 'uncommon', cost: 3, hp: 3, attack: 2, range: 1,
+    abilities: [{ trigger: 'active', effect: 'buff', target: 'self', params: { atk: 1, hp: 1, cost: 1 } }],
+  },
+  {
+    id: 'healer', name: 'Léčitel', rarity: 'uncommon', cost: 3, hp: 3, attack: 1, range: 1,
+    abilities: [{ trigger: 'active', effect: 'heal', target: 'chosen', params: { value: 2, side: 'ally', cost: 1 } }],
+  },
+  {
+    id: 'zapper', name: 'Zaklínač', rarity: 'rare', cost: 4, hp: 3, attack: 1, range: 1,
+    abilities: [{ trigger: 'active', effect: 'damage', target: 'chosen', params: { value: 2, side: 'enemy', range: 3, cost: 1 } }],
   },
 ];
 

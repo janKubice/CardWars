@@ -21,6 +21,10 @@ const STARTER: string[] = [
   'cannon',
   'pyro',
   'commander',
+  'banner',
+  'zealot',
+  'healer',
+  'zapper',
 ];
 
 export const STARTER_DECKS: Record<PlayerId, string[]> = {

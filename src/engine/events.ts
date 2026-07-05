@@ -6,6 +6,7 @@ import type { TriggerData } from './registries.ts';
 import { instantiate, opponent } from './factory.ts';
 import { nextInt } from './rng.ts';
 import { pushLog } from './log.ts';
+import { recomputeAuras } from './auras.ts';
 
 // ─────────────────────────────────────────────────────────────────────────
 //  FRONTA UDÁLOSTÍ — řetězení efektů BEZ rekurze.
@@ -66,6 +67,8 @@ export class EffectRunner {
       const ev = this.queue.shift() as GameEvent;
       this.resolve(ev);
     }
+    // po vyřešení všech událostí přepočítej aury (deska se mohla změnit)
+    recomputeAuras(this.state);
   }
 
   private card(uid: number): CardInstance | undefined {
@@ -90,7 +93,8 @@ export class EffectRunner {
       case 'buff': {
         const c = this.card(ev.uid);
         if (!c || c.zone === 'dead') break;
-        c.attack = Math.max(0, c.attack + (ev.atk ?? 0));
+        // trvalý buff útoku jde do baseAttack (aury se dopočítají zvlášť)
+        if (ev.atk) c.baseAttack = Math.max(0, c.baseAttack + ev.atk);
         if (ev.hp) {
           c.maxHp += ev.hp;
           c.hp += ev.hp;

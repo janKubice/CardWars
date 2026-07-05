@@ -116,3 +116,11 @@ registerTarget('enemyQueen', (state, uid) => {
   if (!c) return [];
   return boardCards(state).filter((x) => x.owner === opponent(c.owner) && x.isQueen);
 });
+
+// Ručně zvolený cíl (aktivní schopnosti). uid(y) přijdou v datech aktivace.
+registerTarget('chosen', (state, _uid, _params, data) => {
+  const ids = ((data as Record<string, unknown> | undefined)?.['chosenUids'] as number[]) ?? [];
+  return ids
+    .map((id) => state.cards.get(id))
+    .filter((c): c is CardInstance => c != null && c.zone === 'board');
+});

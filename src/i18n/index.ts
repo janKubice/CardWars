@@ -73,6 +73,9 @@ const cs: Dict = {
   'battle.turn': 'Tah',
   'battle.endTurn': 'Ukončit tah',
   'battle.hint': 'Vyber kartu z ruky → klikni na zvýrazněné políčko. Klikni na svou jednotku → zaútoč na cíl.',
+  'battle.chooseTarget': 'Vyber cíl aktivace',
+  'battle.attackHint': '⚔ klikni na nepřítele v dosahu',
+  'battle.cancel': 'Zrušit',
   'battle.thinking': 'Bot přemýšlí…',
   'battle.winTitle': 'Souboj vyhrán!',
   'battle.loseTitle': 'Prohra',
@@ -99,7 +102,7 @@ const cs: Dict = {
   // triggers
   'trig.deploy': 'Vylož', 'trig.death': 'Skon', 'trig.wound': 'Zranění', 'trig.onHeal': 'Vyléčení',
   'trig.onShield': 'Zaštítění', 'trig.attack': 'Útok', 'trig.kill': 'Zabití', 'trig.upkeepStart': 'Úsvit',
-  'trig.upkeepEnd': 'Soumrak', 'trig.countdown': 'Odpočet',
+  'trig.upkeepEnd': 'Soumrak', 'trig.countdown': 'Odpočet', 'trig.aura': 'Aura', 'trig.active': 'Aktivace',
   // directions
   'dir.forward': 'vpřed', 'dir.back': 'vzad', 'dir.left': 'vlevo', 'dir.right': 'vpravo',
   'dir.forwardLeft': 'šikmo vpřed-vlevo', 'dir.forwardRight': 'šikmo vpřed-vpravo',
@@ -122,12 +125,14 @@ const cs: Dict = {
   'log.fatigue': '😵 únava: Královna {owner} dostává {n}', 'log.turn': '— tah {n}: na tahu {owner} ({e}/{m}⚡) —',
   'log.guard': '⚠️ pojistka fronty událostí',
   'log.unknownTarget': '⚠️ neznámý cíl {name}', 'log.unknownEffect': '⚠️ neznámý efekt {name}',
+  'log.activate': '✨ {card} použil schopnost',
   // card names
   'card.queen': 'Královna', 'card.recruit': 'Rekrut', 'card.spearman': 'Kopiník', 'card.archer': 'Lučištník',
   'card.medic': 'Zdravotník', 'card.wall': 'Křeček-zeď', 'card.minelayer': 'Minér', 'card.reaper': 'Kosec',
   'card.protector': 'Ochránce', 'card.berserk': 'Berserk', 'card.courier': 'Kurýr', 'card.vengetree': 'Mstivý strom',
   'card.runeshield': 'Runový štít', 'card.avenger': 'Mstitel', 'card.timebomb': 'Časovaná bomba',
   'card.cannon': 'Dělo', 'card.pyro': 'Pyroman', 'card.commander': 'Velitel',
+  'card.zealot': 'Fanatik', 'card.healer': 'Léčitel', 'card.zapper': 'Zaklínač', 'card.banner': 'Válečná standarta',
 };
 
 const en: Dict = {
@@ -151,6 +156,9 @@ const en: Dict = {
   'battle.turn': 'Turn',
   'battle.endTurn': 'End turn',
   'battle.hint': 'Pick a card from hand → click a highlighted tile. Click your unit → attack a target.',
+  'battle.chooseTarget': 'Choose a target',
+  'battle.attackHint': '⚔ click an enemy in range',
+  'battle.cancel': 'Cancel',
   'battle.thinking': 'Bot is thinking…',
   'battle.winTitle': 'Battle won!',
   'battle.loseTitle': 'Defeat',
@@ -171,7 +179,7 @@ const en: Dict = {
   'terrain.mine': 'a mine',
   'trig.deploy': 'Deploy', 'trig.death': 'Death', 'trig.wound': 'Wound', 'trig.onHeal': 'On-Heal',
   'trig.onShield': 'On-Shield', 'trig.attack': 'Attack', 'trig.kill': 'Kill', 'trig.upkeepStart': 'Upkeep',
-  'trig.upkeepEnd': 'End', 'trig.countdown': 'Countdown',
+  'trig.upkeepEnd': 'End', 'trig.countdown': 'Countdown', 'trig.aura': 'Aura', 'trig.active': 'Active',
   'dir.forward': 'forward', 'dir.back': 'back', 'dir.left': 'left', 'dir.right': 'right',
   'dir.forwardLeft': 'diagonally fwd-left', 'dir.forwardRight': 'diagonally fwd-right',
   'dir.backLeft': 'diagonally back-left', 'dir.backRight': 'diagonally back-right',
@@ -190,11 +198,13 @@ const en: Dict = {
   'log.fatigue': "😵 fatigue: {owner}'s Queen takes {n}", 'log.turn': '— turn {n}: {owner} to move ({e}/{m}⚡) —',
   'log.guard': '⚠️ event queue guard tripped',
   'log.unknownTarget': '⚠️ unknown target {name}', 'log.unknownEffect': '⚠️ unknown effect {name}',
+  'log.activate': '✨ {card} used its ability',
   'card.queen': 'Queen', 'card.recruit': 'Recruit', 'card.spearman': 'Spearman', 'card.archer': 'Archer',
   'card.medic': 'Medic', 'card.wall': 'Wall Hamster', 'card.minelayer': 'Minelayer', 'card.reaper': 'Reaper',
   'card.protector': 'Protector', 'card.berserk': 'Berserker', 'card.courier': 'Courier', 'card.vengetree': 'Vengeful Tree',
   'card.runeshield': 'Runeshield', 'card.avenger': 'Avenger', 'card.timebomb': 'Time Bomb',
   'card.cannon': 'Cannon', 'card.pyro': 'Pyromancer', 'card.commander': 'Commander',
+  'card.zealot': 'Zealot', 'card.healer': 'Healer', 'card.zapper': 'Zapper', 'card.banner': 'War Banner',
 };
 
 const STRINGS: Record<Lang, Dict> = { cs, en };

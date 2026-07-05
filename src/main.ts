@@ -3,7 +3,7 @@ import type { CardInstance, PlayerId, Position } from './engine/index.ts';
 import { GameEngine, key } from './engine/index.ts';
 import { botTakeTurn } from './ai/bot.ts';
 import { LIBRARY } from './content/cards.ts';
-import { describeCard, describeDef } from './ui/describe.ts';
+import { describeCard, describeDef, describeAbility } from './ui/describe.ts';
 import { t, cardName, formatLog, getLang, setLang, type Lang } from './i18n/index.ts';
 import {
   createRun, makeBattleConfig, startBattle, onBattleWin, onBattleLoss,
@@ -21,6 +21,7 @@ interface BattleState { engine: GameEngine; selection: Selection; botPending: bo
 let screen: Screen = 'menu';
 let run: RunState | null = null;
 let battle: BattleState | null = null;
+let pendingActive: number | null = null; // uid karty čekající na cíl aktivace
 
 const app = document.getElementById('app') as HTMLDivElement;
 const randomSeed = () => Math.floor(Math.random() * 1e9);
@@ -47,7 +48,11 @@ function legalCells(b: BattleState): Set<string> {
   return b.selection?.type === 'hand' ? new Set(b.engine.legalPlacements(b.selection.uid).map(key)) : new Set();
 }
 function attackTargets(b: BattleState): Set<number> {
+  if (pendingActive != null) return new Set();
   return b.selection?.type === 'board' ? new Set(b.engine.legalAttackTargets(b.selection.uid)) : new Set();
+}
+function activeTargetSet(b: BattleState): Set<number> {
+  return pendingActive != null ? new Set(b.engine.activeTargets(pendingActive)) : new Set();
 }
 
 // ── malé stavební kameny ────────────────────────────────────────────────────
@@ -68,11 +73,12 @@ function pieceCard(c: CardInstance, extra: string): string {
     .filter(Boolean).join(' ');
   const abil = c.abilities.length ? '<span class="dot">✦</span>' : '';
   const title = describeCard(c) || cardName(c.defId);
+  const atkCls = c.attack > c.baseAttack ? 'atk buffed' : 'atk';
   return `<div class="${cls}" title="${escapeAttr(cardName(c.defId) + (title ? ' — ' + title : ''))}">
       ${c.isQueen ? '<span class="crown">♛</span>' : ''}
       <div class="pc__name">${escapeHtml(cardName(c.defId))}${abil}</div>
       ${badges(c)}
-      <div class="pc__foot"><span class="atk">${c.attack}</span><span class="hp">${Math.max(0, c.hp)}</span></div>
+      <div class="pc__foot"><span class="${atkCls}">${c.attack}</span><span class="hp">${Math.max(0, c.hp)}</span></div>
     </div>`;
 }
 
@@ -108,6 +114,7 @@ function renderMenu(): string {
 function renderBoard(b: BattleState): string {
   const legal = legalCells(b);
   const targets = attackTargets(b);
+  const actTargets = activeTargetSet(b);
   const s = b.engine.state;
   let html = `<div class="board" style="grid-template-columns:repeat(${s.cols},1fr)">`;
   for (let r = 0; r < s.rows; r++) {
@@ -120,8 +127,8 @@ function renderBoard(b: BattleState): string {
       if (uid != null) {
         const c = s.cards.get(uid);
         if (c) {
-          const sel = b.selection?.type === 'board' && b.selection.uid === uid ? 'is-sel' : '';
-          const tgt = targets.has(uid) ? 'is-tgt' : '';
+          const sel = (b.selection?.type === 'board' && b.selection.uid === uid) || pendingActive === uid ? 'is-sel' : '';
+          const tgt = targets.has(uid) ? 'is-tgt' : actTargets.has(uid) ? 'is-act' : '';
           inner = pieceCard(c, [sel, tgt].filter(Boolean).join(' '));
         }
       } else if (terr) inner = `<span class="mine">🧨</span>`;
@@ -153,6 +160,26 @@ function playerPlate(side: PlayerId): string {
       ${pips(p.energy, p.maxEnergy)}
     </div>`;
 }
+function renderActionBar(b: BattleState): string {
+  if (pendingActive != null) {
+    return `<div class="actionbar act">
+        <span>🎯 ${t('battle.chooseTarget')}</span>
+        <button class="ghost sm" data-action="cancelactive">✕ ${t('battle.cancel')}</button>
+      </div>`;
+  }
+  if (b.selection?.type !== 'board') return '';
+  const uid = b.selection.uid;
+  const parts: string[] = [];
+  if (b.engine.legalAttackTargets(uid).length > 0) parts.push(`<span class="hint">${t('battle.attackHint')}</span>`);
+  if (b.engine.canActivate(uid)) {
+    const ab = b.engine.activeAbility(uid);
+    if (ab) {
+      const cost = Number(ab.params?.cost ?? 0);
+      parts.push(`<button class="primary sm" data-action="activatebtn" data-uid="${uid}">✨ ${escapeHtml(describeAbility(ab))} (⚡${cost})</button>`);
+    }
+  }
+  return parts.length ? `<div class="actionbar">${parts.join('')}</div>` : '';
+}
 function renderBattle(b: BattleState): string {
   const s = b.engine.state;
   const canEnd = s.active === HUMAN && !b.engine.winner && !b.botPending;
@@ -166,6 +193,7 @@ function renderBattle(b: BattleState): string {
       </div>
       <div class="plates">${playerPlate('B')}${playerPlate('A')}</div>
       ${renderBoard(b)}
+      ${renderActionBar(b)}
       ${renderHand(b)}
       <div class="controls">
         <button class="primary" data-action="endturn" ${canEnd ? '' : 'disabled'}>${t('battle.endTurn')} ⏭</button>
@@ -268,10 +296,18 @@ function render(): void {
 function trySelectBoard(b: BattleState, uid: number | null): void {
   if (uid == null) { b.selection = null; return; }
   const c = b.engine.card(uid);
-  b.selection = c && c.owner === HUMAN && b.engine.legalAttackTargets(uid).length > 0 ? { type: 'board', uid } : null;
+  const canAct = c && c.owner === HUMAN && (b.engine.legalAttackTargets(uid).length > 0 || b.engine.canActivate(uid));
+  b.selection = canAct ? { type: 'board', uid } : null;
 }
 function handleCell(b: BattleState, pos: Position): void {
   const uid = b.engine.state.grid[pos.row][pos.col];
+  if (pendingActive != null) {
+    if (uid != null && b.engine.activeTargets(pendingActive).includes(uid)) b.engine.activate(pendingActive, uid);
+    pendingActive = null;
+    b.selection = null;
+    render();
+    return;
+  }
   if (b.selection?.type === 'hand') {
     if (legalCells(b).has(key(pos))) b.engine.play(b.selection.uid, pos);
     b.selection = null;
@@ -284,6 +320,7 @@ function handleCell(b: BattleState, pos: Position): void {
 function endTurn(b: BattleState): void {
   if (b.engine.active !== HUMAN || b.engine.winner) return;
   b.selection = null;
+  pendingActive = null;
   b.engine.endTurn();
   render();
   if (!b.engine.winner && b.engine.active !== HUMAN) {
@@ -301,7 +338,7 @@ app.addEventListener('click', (e) => {
   if (screen !== 'run' || !run || run.status !== 'battle' || !battle) return;
   if (battle.engine.winner || battle.botPending || battle.engine.active !== HUMAN) return;
   const handEl = el.closest('[data-hand]') as HTMLElement | null;
-  if (handEl) { battle.selection = { type: 'hand', uid: Number(handEl.dataset.hand) }; render(); return; }
+  if (handEl) { battle.selection = { type: 'hand', uid: Number(handEl.dataset.hand) }; pendingActive = null; render(); return; }
   const cellEl = el.closest('[data-cell]') as HTMLElement | null;
   if (cellEl) { const [r, c] = (cellEl.dataset.cell as string).split(',').map(Number); handleCell(battle, { row: r, col: c }); }
 });
@@ -312,6 +349,15 @@ function handleAction(action: string, el: HTMLElement): void {
     case 'home': toMenu(); break;
     case 'newrun': startRun(); break;
     case 'endturn': if (battle) endTurn(battle); break;
+    case 'activatebtn': {
+      if (!battle) break;
+      const uid = Number(el.dataset.uid);
+      const ab = battle.engine.activeAbility(uid);
+      if (ab && ab.target === 'chosen') { pendingActive = uid; render(); }
+      else { battle.engine.activate(uid); pendingActive = null; battle.selection = null; render(); }
+      break;
+    }
+    case 'cancelactive': pendingActive = null; if (battle) battle.selection = null; render(); break;
     case 'afterbattle': afterBattle(); break;
     case 'tobattle': enterBattle(); break;
     case 'reroll': if (run) { reroll(run); render(); } break;

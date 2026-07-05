@@ -21,6 +21,8 @@ export const TRIGGERS = {
   upkeepStart: 'upkeepStart',
   upkeepEnd: 'upkeepEnd',
   countdown: 'countdown',
+  aura: 'aura',
+  active: 'active',
 } as const;
 
 export interface Position {
@@ -65,13 +67,17 @@ export interface CardInstance {
   cost: number;
   hp: number;
   maxHp: number;
+  /** aktuální (efektivní) útok = baseAttack + aury */
   attack: number;
+  /** trvalý útok (def + level + trvalé buffy), bez aur */
+  baseAttack: number;
   range: number;
   shield: number;
   pos: Position | null;
   zone: 'hand' | 'board' | 'dead';
   hasAttacked: boolean;
   justPlayed: boolean;
+  activeUsed: boolean;
   counters: Record<string, number>;
   abilities: AbilityDef[];
   keywords: string[];

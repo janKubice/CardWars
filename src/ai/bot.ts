@@ -52,7 +52,8 @@ function bestPlacement(engine: GameEngine, me: PlayerId, placements: Position[])
 
 type Move =
   | { kind: 'attack'; attacker: number; target: number; score: number }
-  | { kind: 'play'; card: number; pos: Position; score: number };
+  | { kind: 'play'; card: number; pos: Position; score: number }
+  | { kind: 'activate'; card: number; target?: number; score: number };
 
 /** Odehraje celý tah aktivního (botího) hráče a ukončí ho. */
 export function botTakeTurn(engine: GameEngine): void {
@@ -78,10 +79,45 @@ export function botTakeTurn(engine: GameEngine): void {
       if (!best || score > best.score) best = { kind: 'play', card: card.uid, pos, score };
     }
 
+    for (const c of engine.boardCardsOf(me)) {
+      if (!engine.canActivate(c.uid)) continue;
+      const m = scoreActivate(engine, c.uid);
+      if (m && (!best || m.score > best.score)) best = m;
+    }
+
     if (!best || best.score <= 0) break;
 
     if (best.kind === 'attack') engine.attack(best.attacker, best.target);
-    else engine.play(best.card, best.pos);
+    else if (best.kind === 'play') engine.play(best.card, best.pos);
+    else engine.activate(best.card, best.target);
   }
   engine.endTurn();
+}
+
+function scoreActivate(engine: GameEngine, uid: number): Move | null {
+  const ab = engine.activeAbility(uid);
+  if (!ab) return null;
+  const val = Number(ab.params?.value ?? ab.params?.atk ?? 1);
+  if (ab.target !== 'chosen') {
+    return { kind: 'activate', card: uid, score: 1.5 }; // vlastní buff apod.
+  }
+  const targets = engine.activeTargets(uid)
+    .map((id) => engine.card(id))
+    .filter((c): c is CardInstance => c != null);
+  if (targets.length === 0) return null;
+
+  if (ab.effect === 'damage') {
+    const queen = targets.find((t) => t.isQueen);
+    const target = queen ?? [...targets].sort((a, b) => a.hp - b.hp)[0];
+    let score = Math.min(val, target.hp);
+    if (target.isQueen) score += 30;
+    if (val >= target.hp) score += cardValue(target);
+    return { kind: 'activate', card: uid, target: target.uid, score };
+  }
+  if (ab.effect === 'heal') {
+    const wounded = targets.filter((t) => t.hp < t.maxHp).sort((a, b) => (b.maxHp - b.hp) - (a.maxHp - a.hp));
+    if (wounded.length === 0) return null;
+    return { kind: 'activate', card: uid, target: wounded[0].uid, score: Math.min(val, wounded[0].maxHp - wounded[0].hp) };
+  }
+  return { kind: 'activate', card: uid, target: targets[0].uid, score: 1 };
 }

@@ -1,4 +1,4 @@
-import type { CardDef, CardInstance, GameState, PlayerId, Position } from './types.ts';
+import type { AbilityDef, CardDef, CardInstance, GameState, PlayerId, Position } from './types.ts';
 import { TRIGGERS } from './types.ts';
 import { makeRng, nextInt } from './rng.ts';
 import { EffectRunner, drawCards } from './events.ts';
@@ -161,6 +161,65 @@ export class GameEngine {
     return OK;
   }
 
+  // ── Aktivní schopnosti ────────────────────────────────────────────────
+  activeAbility(uid: number): AbilityDef | null {
+    const c = this.state.cards.get(uid);
+    return c?.abilities.find((a) => a.trigger === 'active') ?? null;
+  }
+
+  private activeCost(ab: AbilityDef): number {
+    return Number(ab.params?.['cost'] ?? 0);
+  }
+
+  /** Legální cíle ruční aktivace (jen pro target 'chosen'). */
+  activeTargets(uid: number): number[] {
+    const c = this.state.cards.get(uid);
+    const ab = this.activeAbility(uid);
+    if (!c || !c.pos || !ab || ab.target !== 'chosen') return [];
+    const side = (ab.params?.['side'] as string) ?? 'any';
+    const range = ab.params?.['range'] != null ? Number(ab.params['range']) : Infinity;
+    const out: number[] = [];
+    for (const t of this.state.cards.values()) {
+      if (t.zone !== 'board' || t.pos == null || t.uid === uid) continue;
+      if (side === 'ally' && t.owner !== c.owner) continue;
+      if (side === 'enemy' && t.owner === c.owner) continue;
+      if (distance(c.pos, t.pos) > range) continue;
+      out.push(t.uid);
+    }
+    return out;
+  }
+
+  canActivate(uid: number): boolean {
+    const c = this.state.cards.get(uid);
+    const ab = this.activeAbility(uid);
+    if (!c || c.owner !== this.state.active || c.zone !== 'board' || !ab) return false;
+    if (c.activeUsed) return false;
+    if (this.state.players[this.state.active].energy < this.activeCost(ab)) return false;
+    if (ab.target === 'chosen' && this.activeTargets(uid).length === 0) return false;
+    return true;
+  }
+
+  activate(uid: number, chosenUid?: number): ActionResult {
+    if (this.state.winner) return fail('hra skončila');
+    const c = this.state.cards.get(uid);
+    const ab = this.activeAbility(uid);
+    if (!c || c.owner !== this.state.active || c.zone !== 'board' || !ab) return fail('nelze aktivovat');
+    if (c.activeUsed) return fail('schopnost už použita');
+    const cost = this.activeCost(ab);
+    const p = this.state.players[this.state.active];
+    if (p.energy < cost) return fail('málo energie');
+    const needsTarget = ab.target === 'chosen';
+    if (needsTarget && (chosenUid == null || !this.activeTargets(uid).includes(chosenUid))) return fail('neplatný cíl');
+
+    p.energy -= cost;
+    c.activeUsed = true;
+    pushLog(this.state, 'activate', { card: c.defId });
+    const data = needsTarget ? { chosenUids: [chosenUid as number] } : {};
+    this.runner.enqueue({ type: 'fireTrigger', uid, trigger: TRIGGERS.active, data });
+    this.runner.drain();
+    return OK;
+  }
+
   endTurn(): ActionResult {
     if (this.state.winner) return fail('hra skončila');
     this.startTurn(opponent(this.state.active));
@@ -180,6 +239,7 @@ export class GameEngine {
     for (const c of mine) {
       c.justPlayed = false;
       c.hasAttacked = false;
+      c.activeUsed = false;
     }
 
     // Odpočty (Countdown): sniž a případně odpal.
