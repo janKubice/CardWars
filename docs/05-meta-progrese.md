@@ -49,7 +49,7 @@ Pravidlo: upgrade má být **volba, ne samozřejmost** — do jedné karty inves
 ## 4. Deck-building pravidla
 
 - **Minimální/maximální velikost balíčku** (návrh: min 12, žádné tvrdé max, ale velký balíček ředí komba).
-- **Kopie karet:** kolik stejných smíš mít? (návrh: podle rarity — common víc, legendary max 1). [Otevřená otázka](07-otevrene-otazky.md).
+- **Kopie karet:** limit podle rarity, ale **velkoryse** (nechceme dusit buildy): common 4 / uncommon 3 / rare 3 / epic 2 / legendary 1. Přesná čísla doladíme podle toho, jak silná se ukážou komba.
 - **Startovní balíček:** malý set common karet, ať mají všechny runy stejný čistý start a rozjezd dělá až obchod.
 
 ---

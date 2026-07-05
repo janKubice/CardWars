@@ -2,6 +2,8 @@
 
 Tenhle dokument popisuje, jak se hra reálně hraje. Čísla (velikost desky, výše energie…) jsou **výchozí návrh k vyladění**, ne posvátná — laděním se budeme zabývat při balancování.
 
+> **Severka pro ladění: rychlejší, agresivnější hra.** Cílíme na svižné partie s tlakem na frontu, ne na pomalou šachovinu. Když se při balancování rozhodujeme mezi „bezpečnější/pomalejší" a „agresivnější/rychlejší", volíme to druhé — spíš dostupné útočné karty a Královna ne příliš tanková, aby hry **končily**, ne aby se táhly.
+
 ---
 
 ## 1. Deska

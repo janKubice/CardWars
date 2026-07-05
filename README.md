@@ -14,7 +14,7 @@ Vítězná podmínka je jednoduchá jako v šachu: **padne Královna, končí hr
 
 ## Stav projektu
 
-Zatím **fáze návrhu**. Tady v repu žije kompletní design, ze kterého se pak bude stavět. Kód zatím žádný.
+Zatím **fáze návrhu** — jádro pravidel je rozhodnuté, kód zatím žádný. Plán platforem: **MVP jako jeden HTML soubor na itch.io** (test nápadu), případná plná verze v **C#/Unity na Steam**, a **multiplayer + ELO** až do budoucna. Detaily v [`docs/09-technologie.md`](docs/09-technologie.md).
 
 ## Kde co najdeš
 
@@ -28,6 +28,7 @@ Zatím **fáze návrhu**. Tady v repu žije kompletní design, ze kterého se pa
 | [`docs/06-ai-protivnik.md`](docs/06-ai-protivnik.md) | Jak bude přemýšlet bot |
 | [`docs/07-otevrene-otazky.md`](docs/07-otevrene-otazky.md) | Rozhodnutí, která je potřeba společně dořešit |
 | [`docs/08-roadmapa.md`](docs/08-roadmapa.md) | MVP a milníky vývoje |
+| [`docs/09-technologie.md`](docs/09-technologie.md) | Tech a platformy: web MVP (jeden HTML soubor, itch) → C#/Unity (Steam) → MP + ELO |
 
 ## Jak s dokumentací pracujeme
 

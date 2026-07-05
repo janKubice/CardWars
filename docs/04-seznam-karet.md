@@ -60,6 +60,8 @@ Reprezentativní řez napříč raritami — ne finální 100+, ale dost na to, 
 | **Ochránce** | 2 | 3/1 (1) | *Vylož:* Štít 3 zvolenému spojenci (**Ochránce**) |
 | **Berserk** | 2 | 4/3 (1) | *Křehkost:* +1 přijaté dmg (levnější za nevýhodu) |
 | **Kurýr** | 2 | 2/1 (1) | *Vylož:* Dober 1 kartu |
+| **Mstivý strom** | 3 | 5/1 (1) | *Vyléčení:* Buff +1 síla natrvalo (roste, když ho léčíš) |
+| **Runový štít** | 2 | 3/1 (1) | *Zaštítění:* Damage 1 vpřed (štít = spouštěč, ne jen obrana) |
 
 ### Rare (build-defining)
 

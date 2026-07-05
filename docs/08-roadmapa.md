@@ -7,24 +7,26 @@ Vývojová strategie stojí na jednom principu: **nejdřív dokázat, že jádro
 ## Fáze 0 – Design (teď)
 
 - [x] Sepsat vizi, jádro, systém karet, meta, AI, otevřené otázky.
-- [ ] Rozhodnout [otevřené otázky](07-otevrene-otazky.md) 1–7 (mění jádro).
-- [ ] Zvolit tech stack.
+- [x] Rozhodnout [otevřené otázky](07-otevrene-otazky.md) 1–12 (jádro dořešeno).
+- [x] Zvolit tech stack — **web MVP jako jeden HTML soubor (TS), pak C#/Unity na Steam** (viz [09](09-technologie.md)).
 
-**Výstup:** shoda na tom, co stavíme.
+**Výstup:** shoda na tom, co stavíme. ✅ Můžeme do Fáze 1.
 
 ---
 
 ## Fáze 1 – MVP jádra („je to vůbec zábava?")
 
-Cíl: **jeden hratelný souboj** na malé desce, žádná ekonomika, pevný balíček.
+Cíl: **jeden hratelný souboj** na desce 7×6, žádná ekonomika, pevný balíček. Postaveno jako web (TS + DOM/CSS), s **oddělením engine od renderu** od prvního dne (viz [09](09-technologie.md)).
 
-- [ ] Deska + vykreslení mřížky, dvě Královny.
-- [ ] Pravidlo přiléhavého pokládání.
+- [ ] Kostra projektu: TS + Vite, engine (čistá logika) oddělený od renderu.
+- [ ] Deska 7×6 + vykreslení mřížky (CSS grid), dvě Královny.
+- [ ] Pravidlo přiléhavého pokládání (8-sousedství).
 - [ ] Energie + tahy.
-- [ ] Souboj: útok, dostřel, protiúder, ničení, HP.
+- [ ] Souboj: útok, dostřel, protiúder, ničení, HP, únava z vyložení.
 - [ ] ~15–20 karet z [ukázkového setu](04-seznam-karet.md) (jen základní keywordy: Vylož, Skon, Úsvit, Damage/Heal/Štít).
 - [ ] Vítězná podmínka (padne Královna).
 - [ ] Nejjednodušší bot (skóruje 1 akci dopředu).
+- [ ] Export do **jednoho HTML souboru** a nahrání na **itch.io** k testu.
 
 **Test úspěchu:** *„Chce se mi hrát druhou partii?"* Pokud ne → ladíme jádro, **nepřidáváme obsah.**
 
@@ -52,12 +54,31 @@ Cíl: **jeden hratelný souboj** na malé desce, žádná ekonomika, pevný bal�
 
 ---
 
-## Fáze 4 – Meta a leštění
+## Fáze 4 – Meta a leštění (dokončení webové solo verze)
 
 - [ ] Progrese mezi runy (odemykání karet, volitelné Královny).
 - [ ] Výzvy / mutátory.
 - [ ] Balancování celého poolu, tuning ekonomiky.
-- [ ] (Volitelně) multiplayer hráč vs. hráč.
+
+**Milník:** hotová, vyladěná **solo hra na webu**. Tady se rozhoduje, jestli se jde na Steam.
+
+---
+
+## Fáze 5 – Steam verze (C#/Unity)
+
+Až je web solo verze zábavná a vyladěná — teprve pak se investuje do portu.
+
+- [ ] Přepis **enginu do C#** (JSON karet se recykluje 1:1).
+- [ ] Render v Unity (pořád „jen kartičky"), UI, nastavení, ukládání.
+- [ ] Buildy Win/Mac/Linux, integrace Steamu (achievementy, cloud saves).
+
+---
+
+## Fáze 6 – Multiplayer + ELO (nejzazší)
+
+- [ ] Síťová vrstva nad deterministickým enginem (autoritativní sim, posílají se jen akce).
+- [ ] Nejdřív async / hot-seat, pak realtime 1v1.
+- [ ] ELO/MMR párování, žebříčky, sezóny.
 
 ---
 

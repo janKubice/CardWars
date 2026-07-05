@@ -33,12 +33,16 @@ Volitelná/pozdější pole: `Move` (kolik políček se umí posunout, výchozí
 | **Vylož** (Deploy) | ve chvíli vyložení karty na desku |
 | **Skon** (Death) | když je karta zničena (i vlastní rukou!) |
 | **Zranění** (Wound) | když tato karta utrpí poškození |
+| **Vyléčení** (On-Heal) | když je tato karta vyléčena |
+| **Zaštítění** (On-Shield) | když tato karta dostane štít |
 | **Útok** (On-Attack) | když tato karta útočí |
 | **Zabití** (On-Kill) | když tato karta něco zničí |
 | **Úsvit / Soumrak** (Upkeep) | na začátku / konci tvého tahu |
 | **Odpočet N** (Countdown) | po N tvých tazích se spustí efekt (počítadlo klesá o 1 za tah) |
 | **Aura** | trvale, dokud karta stojí (pasivní efekt v nějaké oblasti) |
 | **Aktivace** (Active) | ručně spustíš ve svém tahu (typicky za energii, často 1×/tah) |
+
+> **Vyléčení / Zaštítění** jsou reaktivní triggery (jako Zranění) a otevírají support/combo archetypy: „*když je vyléčena, přidej si +1 sílu*", „*když dostane štít, vystřel projektil vpřed*". Krásně se páruje se Zdravotníkem a Ochráncem — jeden hráč staví „regen/štít" build, kde léčení a štíty nejsou jen obrana, ale spouštěč efektů.
 
 ---
 

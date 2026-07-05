@@ -1,39 +1,39 @@
-# 07 – Otevřené otázky
+# 07 – Rozhodnutá pravidla a otevřené otázky
 
-Rozhodnutí, která je potřeba dořešit. U každého je **můj doporučený default** (co jsem prozatím zapsal do designu), ať se dá stavět dál, a alternativa. Jak je rozhodneme, přesune se pravidlo do příslušného dokumentu a otázka se odsud smaže.
+Dřív seznam otevřených otázek; teď hlavně **záznam rozhodnutí** (decision log). Rozhodnutá pravidla jsou už promítnutá do příslušných designových dokumentů — tady zůstávají pro přehled „proč to tak je".
 
-| # | Otázka | Můj default | Alternativa / poznámka |
-|---|---|---|---|
-| 1 | **Sousedství pro pokládání** – 8 políček (i diagonály), nebo 4 (jen ortho)? | **8-sousedství** (ladí se směrovými schopnostmi) | 4-ortho zpomalí a zpřísní expanzi — možná lepší pro pomalejší, šachovější hru |
-| 2 | **Velikost desky** | **7×6** | menší = rychlejší/agresivnější, větší = víc manévru; ladit playtestem |
-| 3 | **Chodí karty po desce?** | **Ne** (statické, přesun jen schopnostmi) | pohyb (Duelyst-style) přidá hloubku, ale i mikromanagement a složitost |
-| 4 | **Model zdrojů** | **Rampující energie** (1→10, HS-style) | pevná energie / mana-krystaly jako karty / action pointy |
-| 5 | **Má Královna vlastní útok a schopnost?** | **Malý útok + volitelná signature schopnost** | úplně pasivní Královna = čistší, ale míň zajímavá |
-| 6 | **Protiúder v boji zblízka** | **Ano** (obránce vrací sílu, jako HS) | bez protiúderu = agresivnější, jednodušší |
-| 7 | **Únava z vyložení (summoning sickness)** | **Ano** (kromě keywordu *Nájezd*) | bez ní hrozí „vylož a hned zabij Královnu" |
-| 8 | **Limit kopií karty v balíčku** | **Podle rarity** (common víc, legendary 1) | jednotný limit (např. max 2) je jednodušší |
-| 9 | **Přetečení ruky** | **pálí se přebytek** (HS-style) | tvrdý zákaz dobrat / žádný limit |
-| 10 | **Obě Královny padnou naráz** | **prohrává aktivní hráč** | remíza |
-| 11 | **Jazyk názvů/keywordů v kódu** | **strojové id anglicky, UI/docs česky** | vše česky / vše anglicky |
-| 12 | **Tech stack** | *nerozhodnuto* — viz níže | |
+## Rozhodnuto (jádro)
 
-## K bodu 12 — technologie (až budeme u kódu)
+| # | Otázka | Rozhodnutí |
+|---|---|---|
+| 1 | Sousedství pro pokládání | **8-sousedství** (ortogonálně + diagonály) |
+| 2 | Velikost desky | **7×6** (ladit playtestem) |
+| 3 | Chodí karty po desce? | **Ne** — statické, přesun jen schopnostmi (swap) |
+| 4 | Model zdrojů | **Rampující energie** 1→10 (HS-style) |
+| 5 | Královna | **malý vlastní útok + volitelná signature schopnost** |
+| 6 | Protiúder v boji zblízka | **Ano** (obránce vrací sílu) |
+| 7 | Únava z vyložení | **Ano** (kromě keywordu *Nájezd*) |
+| 8 | Limit kopií v balíčku | **Podle rarity, ale velkoryse:** common 4 / uncommon 3 / rare 3 / epic 2 / legendary 1 |
+| 9 | Přetečení ruky | **pálí se přebytek** |
+| 10 | Obě Královny padnou naráz | **prohrává aktivní hráč** |
+| 11 | Jazyk v kódu | **strojové id anglicky, UI/docs česky** |
+| 12 | Tech / platformy | **MVP single-file HTML → itch; plná verze C#/Unity → Steam; MP+ELO později** (viz [09](09-technologie.md)) |
 
-Zatím nezavírám, ale pro tenhle typ hry (2D mřížka, data-driven karty, poběží ideálně i v prohlížeči) dávají smysl:
+## Směr hry (Honzovy odpovědi)
 
-- **Web (TypeScript + Canvas/Pixi.js, nebo React pro UI + herní plátno)** — nejsnadnější sdílení, hraje se v prohlížeči, rychlá iterace. **Můj tip pro prototyp.**
-- **Godot** — pokud chceme nativní/desktopové vydání a pohodlný editor scén.
-- **Unity** — nejvíc možností, ale těžší a pomalejší iterace pro malý projekt.
+- **Tempo:** spíš **rychlejší / agresivnější** než pomalá šachovina. → severka pro balancování, viz [herní design](02-herni-design.md).
+- **Platforma:** **nejdřív web (itch), pak Steam.**
+- **Multiplayer:** **nejdřív solo vs. bot; MP + ELO až později** na Steamu.
+- **Vizuál:** **jen kartičky se schopnostmi** (klasické karty s vlastnostmi), žádné ilustrované jednotky. → render zvládne DOM/CSS, zrychluje MVP.
 
-Doporučení: **prototyp v TypeScriptu na webu** — jádro (deska, přiléhavost, souboj) se dá ověřit ve dnech a hraje se odkudkoli. Rozhodneme, až budeme opouštět fázi designu.
+## Nové / zbývající otevřené otázky
 
----
+Tyhle se budou řešit hlavně playtestem nebo až u konkrétní fáze:
 
-## Otázky na tebe (Honzo)
-
-Tyhle bych rád slyšel od tebe, ať míříme správně:
-
-1. **Ladíš spíš k rychlé agresivní hře, nebo k pomalejší „šachové" taktice?** (ovlivní body 1–3, 6)
-2. **Cílová platforma** — hraješ si s tím pro sebe / web / mobil / Steam? (ovlivní tech i rozsah)
-3. **Solo hra proti botovi je cíl, nebo časem i multiplayer** hráč vs. hráč?
-4. **Vizuální styl** — „klasické hrací karty s vlastnostmi" (jak jsi psal) vs. ilustrované jednotky. Máš představu?
+| Téma | Poznámka |
+|---|---|
+| Přesné hodnoty tempa | HP Královny (~30?), start energie, ceny agro karet — doladit tak, aby hra **končila**, ne se táhla |
+| Přesná čísla limitů kopií | výše je návrh; upravit podle toho, jak silná se ukážou komba |
+| Odměny / křivka ekonomiky | kolik zlata za výhru, ceny v obchodě, cena rerollu — až bude obchod (Fáze 2) |
+| MP netcode | autoritativní server vs. lockstep — engine držíme deterministický, ať je to pak snadné (řeší se u Steam verze) |
+| ELO/MMR detaily | párování, žebříčky, sezóny — až bude MP |
