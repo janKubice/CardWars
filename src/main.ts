@@ -4,6 +4,7 @@ import { GameEngine, key } from './engine/index.ts';
 import { stepBot } from './ai/bot.ts';
 import { LIBRARY } from './content/cards.ts';
 import { describeCard, describeDef, describeAbility } from './ui/describe.ts';
+import { initSprites, frameFor } from './ui/sprites.ts';
 import { t, cardName, formatLog, getLang, setLang, type Lang } from './i18n/index.ts';
 import {
   createRun, makeBattleConfig, startBattle, onBattleWin, onBattleLoss,
@@ -141,9 +142,12 @@ function pieceCard(c: CardInstance, extra: string): string {
   const abil = c.abilities.length ? '<span class="dot">✦</span>' : '';
   const title = describeCard(c) || cardName(c.defId);
   const atkCls = c.attack > c.baseAttack ? 'atk buffed' : 'atk';
-  return `<div class="${cls}" data-uid="${c.uid}" title="${escapeAttr(cardName(c.defId) + (title ? ' — ' + title : ''))}">
+  const frame = frameFor(c.owner, c.isQueen);
+  const bg = frame ? `style="background-image:url(${frame})"` : '';
+  // jméno je v tooltipu, na desce ukazujeme jen art + staty (ať to není přeplácané)
+  return `<div class="${cls}" data-uid="${c.uid}" ${bg} title="${escapeAttr(cardName(c.defId) + (title ? ' — ' + title : ''))}">
       ${c.isQueen ? '<span class="crown">♛</span>' : ''}
-      <div class="pc__name">${escapeHtml(cardName(c.defId))}${abil}</div>
+      ${abil ? '<span class="pc__abil">✦</span>' : ''}
       <div class="pc__art">${cardArt(c.defId)}</div>
       ${badges(c)}
       <div class="pc__foot"><span class="${atkCls}">${c.attack}</span><span class="hp">${Math.max(0, c.hp)}/${c.maxHp}</span></div>
@@ -495,4 +499,5 @@ function escapeAttr(s: string): string {
   return escapeHtml(s).replace(/"/g, '&quot;');
 }
 
-render();
+// nejdřív nařež pixel-art rámečky, pak vykresli
+initSprites().finally(render);
