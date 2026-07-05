@@ -1,30 +1,7 @@
 import type { AbilityDef, CardDef, CardInstance } from '../engine/index.ts';
+import { t } from '../i18n/index.ts';
 
-// Převod schopnosti na krátký český text (do tooltipu / detailu karty).
-
-const TRIGGER_LABEL: Record<string, string> = {
-  deploy: 'Vylož',
-  death: 'Skon',
-  wound: 'Zranění',
-  onHeal: 'Vyléčení',
-  onShield: 'Zaštítění',
-  attack: 'Útok',
-  kill: 'Zabití',
-  upkeepStart: 'Úsvit',
-  upkeepEnd: 'Soumrak',
-  countdown: 'Odpočet',
-};
-
-const DIR_LABEL: Record<string, string> = {
-  forward: 'vpřed',
-  back: 'vzad',
-  left: 'vlevo',
-  right: 'vpravo',
-  forwardLeft: 'šikmo vpřed-vlevo',
-  forwardRight: 'šikmo vpřed-vpravo',
-  backLeft: 'šikmo vzad-vlevo',
-  backRight: 'šikmo vzad-vpravo',
-};
+// Lokalizovaný popis schopnosti/karty. Vše přes i18n (t()).
 
 function n(params: Record<string, unknown> | undefined, ...keys: string[]): number {
   if (!params) return 1;
@@ -32,58 +9,57 @@ function n(params: Record<string, unknown> | undefined, ...keys: string[]): numb
   return 1;
 }
 
+function dir(params: Record<string, unknown> | undefined): string {
+  return t('dir.' + String(params?.direction ?? 'forward'));
+}
+
 function effectText(a: AbilityDef): string {
   const p = a.params ?? {};
   switch (a.effect) {
-    case 'damage': return `dá ${n(p, 'value', 'amount', 'damage')} dmg`;
-    case 'heal': return `léčí ${n(p, 'value', 'amount')}`;
-    case 'shield': return `štít ${n(p, 'value', 'amount')}`;
-    case 'buff': return `+${Number(p.atk ?? 0)}/${Number(p.hp ?? 0)}`;
-    case 'destroy': return 'zničí';
-    case 'terrain': return `rozmístí ${String(p.terrain ?? 'mina')}`;
-    case 'discardRandom': return 'zahodí nepříteli kartu z ruky';
-    case 'draw': return `dober ${n(p, 'value', 'count')}`;
-    case 'summon': return 'přivolá jednotku';
+    case 'damage': return t('ab.damage', { n: n(p, 'value', 'amount', 'damage') });
+    case 'heal': return t('ab.heal', { n: n(p, 'value', 'amount') });
+    case 'shield': return t('ab.shield', { n: n(p, 'value', 'amount') });
+    case 'buff': return t('ab.buff', { atk: Number(p.atk ?? 0), hp: Number(p.hp ?? 0) });
+    case 'destroy': return t('ab.destroy');
+    case 'terrain': return t('ab.terrain', { t: t('terrain.' + String(p.terrain ?? 'mine')) });
+    case 'discardRandom': return t('ab.discardRandom');
+    case 'draw': return t('ab.draw', { n: n(p, 'value', 'count') });
+    case 'summon': return t('ab.summon');
     default: return a.effect;
   }
 }
 
 function targetText(a: AbilityDef): string {
-  const p = a.params ?? {};
   switch (a.target) {
-    case 'self': return 'sobě';
+    case 'self': return t('tg.self');
     case 'none': return '';
-    case 'neighbor': return `sousedovi ${DIR_LABEL[String(p.direction ?? 'forward')]}`;
-    case 'direction': return `${DIR_LABEL[String(p.direction ?? 'forward')]}`;
-    case 'around': return 'v okolí';
-    case 'aroundVictim': return 'v okolí oběti';
-    case 'lowestHpAlly': return 'nejslabšímu spojenci';
-    case 'allEnemies': return 'všem nepřátelům';
-    case 'allAllies': return 'všem spojencům';
-    case 'enemyQueen': return 'nepřátelské Královně';
+    case 'neighbor': return t('tg.neighbor', { dir: dir(a.params) });
+    case 'direction': return t('tg.direction', { dir: dir(a.params) });
+    case 'around': return t('tg.around');
+    case 'aroundVictim': return t('tg.aroundVictim');
+    case 'lowestHpAlly': return t('tg.lowestHpAlly');
+    case 'allEnemies': return t('tg.allEnemies');
+    case 'allAllies': return t('tg.allAllies');
+    case 'enemyQueen': return t('tg.enemyQueen');
     default: return a.target;
   }
 }
 
 export function describeAbility(a: AbilityDef): string {
-  const trig = TRIGGER_LABEL[a.trigger] ?? a.trigger;
-  const count = a.trigger === 'countdown' ? ` ${n(a.params, 'count')}` : '';
+  const trig = t('trig.' + a.trigger);
+  const count = a.trigger === 'countdown' ? ' ' + n(a.params, 'count') : '';
   const parts = [effectText(a), targetText(a)].filter(Boolean).join(' ');
   return `${trig}${count}: ${parts}`;
 }
 
-function keywordLabel(k: string): string {
-  return k === 'charge' ? 'Nájezd' : k === 'fragile' ? 'Křehkost' : k;
+function keywords(kw: string[]): string[] {
+  return kw.map((k) => t('kw.' + k));
 }
 
 export function describeCard(c: CardInstance): string {
-  const kw = c.keywords.map(keywordLabel);
-  const lines = c.abilities.map(describeAbility);
-  return [...kw, ...lines].join(' • ');
+  return [...keywords(c.keywords), ...c.abilities.map(describeAbility)].join(' • ');
 }
 
 export function describeDef(def: CardDef): string {
-  const kw = (def.keywords ?? []).map(keywordLabel);
-  const lines = (def.abilities ?? []).map(describeAbility);
-  return [...kw, ...lines].join(' • ');
+  return [...keywords(def.keywords ?? []), ...(def.abilities ?? []).map(describeAbility)].join(' • ');
 }

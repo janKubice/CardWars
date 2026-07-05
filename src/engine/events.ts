@@ -5,6 +5,7 @@ import { getEffect, getTarget } from './registries.ts';
 import type { TriggerData } from './registries.ts';
 import { instantiate, opponent } from './factory.ts';
 import { nextInt } from './rng.ts';
+import { pushLog } from './log.ts';
 
 // ─────────────────────────────────────────────────────────────────────────
 //  FRONTA UDÁLOSTÍ — řetězení efektů BEZ rekurze.
@@ -38,7 +39,7 @@ export interface EffectAPI {
   draw(owner: PlayerId, count: number): void;
   swap(uidA: number, uidB: number): void;
   rngInt(n: number): number;
-  log(msg: string): void;
+  log(code: string, params?: Record<string, string | number>): void;
 }
 
 export class EffectRunner {
@@ -59,7 +60,7 @@ export class EffectRunner {
     while (this.queue.length > 0) {
       if (this.state.winner) break;
       if (guard++ > 20000) {
-        this.state.log.push('⚠️ pojistka fronty událostí — přerušeno');
+        pushLog(this.state, 'guard');
         break;
       }
       const ev = this.queue.shift() as GameEvent;
@@ -119,11 +120,11 @@ export class EffectRunner {
     c.shield -= absorbed;
     const dealt = amount - absorbed;
     if (dealt <= 0) {
-      this.state.log.push(`🛡️ ${c.name} pohltil štítem ${absorbed}`);
+      pushLog(this.state, 'shieldAbsorb', { card: c.defId, n: absorbed });
       return;
     }
     c.hp -= dealt;
-    this.state.log.push(`💥 ${c.name} dostal ${dealt} (${Math.max(0, c.hp)}/${c.maxHp})`);
+    pushLog(this.state, 'damage', { card: c.defId, n: dealt });
     this.enqueue({ type: 'fireTrigger', uid, trigger: TRIGGERS.wound, data: { amount: dealt, sourceUid } });
     if (c.hp <= 0) this.enqueue({ type: 'destroy', uid, sourceUid, reason: 'zabit' });
   }
@@ -135,7 +136,7 @@ export class EffectRunner {
     c.hp = Math.min(c.maxHp, c.hp + amount);
     const healed = c.hp - before;
     if (healed > 0) {
-      this.state.log.push(`❤️ ${c.name} vyléčen o ${healed}`);
+      pushLog(this.state, 'heal', { card: c.defId, n: healed });
       this.enqueue({ type: 'fireTrigger', uid, trigger: TRIGGERS.onHeal, data: { amount: healed } });
     }
   }
@@ -147,7 +148,7 @@ export class EffectRunner {
     if (c.pos) removeFromGrid(this.state, c.pos);
     const deadPos = c.pos;
     c.pos = null;
-    this.state.log.push(`☠️ ${c.name} zničen`);
+    pushLog(this.state, 'destroy', { card: c.defId });
 
     // Skon (deathrattle)
     this.enqueue({ type: 'fireTrigger', uid, trigger: TRIGGERS.death, data: { pos: deadPos } });
@@ -163,7 +164,7 @@ export class EffectRunner {
     // Vítězná podmínka: padla Královna.
     if (c.isQueen) {
       this.state.winner = opponent(c.owner);
-      this.state.log.push(`👑 Královna hráče ${c.owner} padla — vítězí ${this.state.winner}!`);
+      pushLog(this.state, 'queenFell', { owner: c.owner, winner: this.state.winner });
     }
   }
 
@@ -181,11 +182,11 @@ export class EffectRunner {
     const resolver = getTarget(ability.target);
     const effect = getEffect(ability.effect);
     if (!resolver) {
-      this.state.log.push(`⚠️ neznámý cíl '${ability.target}'`);
+      pushLog(this.state, 'unknownTarget', { name: ability.target });
       return;
     }
     if (!effect) {
-      this.state.log.push(`⚠️ neznámý efekt '${ability.effect}'`);
+      pushLog(this.state, 'unknownEffect', { name: ability.effect });
       return;
     }
     const params = ability.params ?? {};
@@ -220,7 +221,7 @@ export class EffectRunner {
         const inst = instantiate(state, defId, owner, 'board');
         placeOnGrid(state, inst.uid, pos);
         runner.enqueue({ type: 'fireTrigger', uid: inst.uid, trigger: TRIGGERS.deploy });
-        state.log.push(`✨ přivolán ${inst.name}`);
+        pushLog(state, 'summon', { card: inst.defId });
         return inst;
       },
       setTerrain(pos, type, params) {
@@ -234,7 +235,7 @@ export class EffectRunner {
         p.hand.splice(idx, 1);
         const c = state.cards.get(uid);
         if (c) c.zone = 'dead';
-        state.log.push(`🗑️ hráč ${owner} přišel o kartu z ruky (${c?.name ?? '?'})`);
+        pushLog(state, 'discard', { owner, card: c?.defId ?? 'queen' });
       },
       draw(owner, count) {
         drawCards(state, owner, count);
@@ -247,13 +248,13 @@ export class EffectRunner {
         const pb = b.pos;
         placeOnGrid(state, uidA, pb);
         placeOnGrid(state, uidB, pa);
-        state.log.push(`🔄 swap ${a.name} ↔ ${b.name}`);
+        pushLog(state, 'swap', { src: a.defId, tgt: b.defId });
       },
       rngInt(n) {
         return nextInt(state.rng, n);
       },
-      log(msg) {
-        state.log.push(msg);
+      log(code, params) {
+        pushLog(state, code, params);
       },
     };
   }
@@ -268,7 +269,7 @@ export function drawCards(state: GameState, owner: PlayerId, count: number): voi
     const inst = instantiate(state, defId, owner, 'hand');
     if (p.hand.length >= p.handLimit) {
       inst.zone = 'dead';
-      state.log.push(`🔥 ruka plná, ${inst.name} spálen`);
+      pushLog(state, 'burn', { card: inst.defId });
       continue;
     }
     p.hand.push(inst.uid);

@@ -14,10 +14,9 @@ Vítězná podmínka je jednoduchá jako v šachu: **padne Královna, končí hr
 
 ## Stav projektu
 
-**Hratelné roguelike MVP běží.** Kompletní smyčka: **obchod → souboj → obchod**, 8 ante proti sílícímu botovi, stavění balíčku za zlato. Deska 7×6, přiléhavé pokládání, energie, souboj, systém schopností. Vše v prohlížeči, buildí se do **jednoho HTML souboru** (~35 kB) pro itch.io.
+**Hratelné roguelike MVP běží.** Kompletní smyčka: **menu → obchod → souboj → obchod**, 8 ante proti sílícímu botovi, stavění balíčku za zlato. Deska 7×6, přiléhavé pokládání, energie, souboj, systém schopností. **Výběr jazyka CS / EN** (včetně názvů karet, popisů schopností i logu). Vše v prohlížeči, buildí se do **jednoho HTML souboru** (~50 kB) pro itch.io.
 
-Souboj a obchod:
-
+![CardWars menu](docs/img/menu.png)
 ![CardWars souboj](docs/img/mvp.png)
 ![CardWars obchod](docs/img/shop.png)
 

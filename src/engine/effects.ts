@@ -48,7 +48,7 @@ registerEffect('terrain', (api, params, _targets, sourceUid) => {
   for (const p of neighbors8(state, c.pos)) {
     if (isEmpty(state, p)) api.setTerrain(p, type, { damage });
   }
-  api.log(`🧨 ${c.name} rozmístil ${type} do okolí`);
+  api.log('terrain', { card: c.defId, t: type });
 });
 
 // Zahodí náhodnou kartu z ruky protivníka zdroje.

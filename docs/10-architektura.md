@@ -76,6 +76,14 @@ runner.enqueue({ type: 'fireTrigger', uid, trigger: 'onSpendEnergy' });
 ```
 Přidej ho do konstanty `TRIGGERS` (`engine/types.ts`) pro přehled a do popisovače v `ui/describe.ts`. Karty ho pak používají jako `trigger: 'onSpendEnergy'`.
 
+### 🌍 Lokalizace (CS / EN)
+
+Vše hráči viditelné jde přes `src/i18n/`. Engine **nikdy neskládá hotové věty** — log je strukturovaný (`{ code, params }`) a text se sestaví až v UI (`formatLog`), takže je plně přeložitelný.
+
+- **Přidat text:** klíč do `cs` i `en` slovníku v `src/i18n/index.ts`, použij `t('klíč', { param })`.
+- **Přeložit kartu:** název je `card.<id>` v obou slovnících; popis schopnosti se generuje z klíčů `trig.*`, `ab.*`, `tg.*`, `dir.*` (viz `ui/describe.ts`) — nová schopnost je automaticky přeložená, když má tyhle klíče.
+- **Přidat jazyk:** rozšiř `Lang` a přidej slovník; jinde se nic nemění. Volba se ukládá do `localStorage`.
+
 ### ➕ Nový pasivní keyword (např. „nedá se léčit")
 
 Keywordy jsou stringy na kartě (`keywords: ['noHeal']`). Zohledni je tam, kde dává smysl — např. v `resolveHeal` (`engine/events.ts`) přeskoč léčení, pokud `card.keywords.includes('noHeal')`. Pak je přidej do popisu v `describe.ts`.

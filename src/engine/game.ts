@@ -4,6 +4,7 @@ import { makeRng, nextInt } from './rng.ts';
 import { EffectRunner, drawCards } from './events.ts';
 import { instantiate, opponent } from './factory.ts';
 import { distance, inBounds, isEmpty, key, neighbors8, placeOnGrid } from './board.ts';
+import { pushLog } from './log.ts';
 
 // Import vestavěných efektů a cílů kvůli jejich registraci (side-effect).
 import './effects.ts';
@@ -114,7 +115,7 @@ export class GameEngine {
     c.hasAttacked = false;
     c.justPlayed = !c.keywords.includes('charge');
     placeOnGrid(this.state, cardUid, pos);
-    this.state.log.push(`▶️ ${c.owner} vyložil ${c.name} na (${pos.row},${pos.col})`);
+    pushLog(this.state, 'play', { owner: c.owner, card: c.defId });
 
     // Mina na políčku?
     const terr = this.state.terrain.get(key(pos));
@@ -142,7 +143,7 @@ export class GameEngine {
     if (dist > a.range) return fail('mimo dostřel');
 
     a.hasAttacked = true;
-    this.state.log.push(`⚔️ ${a.name} útočí na ${t.name}`);
+    pushLog(this.state, 'attack', { src: a.defId, tgt: t.defId });
     this.runner.enqueue({ type: 'fireTrigger', uid: attackerUid, trigger: TRIGGERS.attack, data: { targetUid } });
     this.runner.enqueue({ type: 'damage', uid: targetUid, amount: a.attack, sourceUid: attackerUid });
     this.runner.drain();
@@ -207,14 +208,14 @@ export class GameEngine {
       p.fatigue += 1;
       const queen = mine.find((c) => c.isQueen);
       if (queen) {
-        s.log.push(`😵 únava: Královna ${player} dostává ${p.fatigue}`);
+        pushLog(s, 'fatigue', { owner: player, n: p.fatigue });
         this.runner.enqueue({ type: 'damage', uid: queen.uid, amount: p.fatigue });
         this.runner.drain();
       }
     } else {
       drawCards(s, player, 1);
     }
-    s.log.push(`— tah ${s.turnNumber}: na tahu ${player} (energie ${p.energy}/${p.maxEnergy}) —`);
+    pushLog(s, 'turn', { n: s.turnNumber, owner: player, e: p.energy, m: p.maxEnergy });
   }
 
   // ── Sestavení hry ─────────────────────────────────────────────────────

@@ -100,6 +100,16 @@ export interface RngState {
   seed: number;
 }
 
+/**
+ * Záznam do logu je strukturovaný (kód + parametry), ne hotový text —
+ * díky tomu se dá lokalizovat v UI. Parametry `card`/`src`/`tgt` nesou id
+ * karty (přeloží se na název), ostatní jsou čísla / identifikátory stran.
+ */
+export interface LogEntry {
+  code: string;
+  params?: Record<string, string | number>;
+}
+
 export interface GameState {
   rows: number;
   cols: number;
@@ -111,7 +121,7 @@ export interface GameState {
   turnNumber: number;
   terrain: Map<string, TerrainCell>;
   winner: PlayerId | null;
-  log: string[];
+  log: LogEntry[];
   nextUid: number;
   rng: RngState;
   energyCap: number;

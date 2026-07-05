@@ -6,6 +6,7 @@ import { GameEngine } from '../src/engine/game.ts';
 import { botTakeTurn } from '../src/ai/bot.ts';
 import { LIBRARY } from '../src/content/cards.ts';
 import { STARTER_DECKS } from '../src/content/decks.ts';
+import { formatLog } from '../src/i18n/index.ts';
 
 declare const process: { exit(code: number): never };
 
@@ -33,7 +34,7 @@ const demo = new GameEngine({ seed: 7, library: LIBRARY, decks: STARTER_DECKS })
 let g = 0;
 while (!demo.winner && g++ < 400) botTakeTurn(demo);
 console.log('\n— posledních 12 řádků logu (seed 7) —');
-for (const line of demo.state.log.slice(-12)) console.log('  ' + line);
+for (const line of demo.state.log.slice(-12)) console.log('  ' + formatLog(line));
 
 console.log(`\nVýsledek: ${ok}/${N} partií skončilo vítězstvím, ${stuck} zaseknutých.`);
 if (stuck > 0) {
