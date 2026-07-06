@@ -231,6 +231,13 @@ button:disabled { opacity: .5; cursor: not-allowed; }
 }
 .shopbar .gold { color: var(--gold-deep); }
 .shopbar__title { font-family: var(--serif); font-size: 20px; font-weight: 800; }
+.bossnote {
+  margin-bottom: 12px; padding: 4px 14px; font-size: 14px; color: var(--ink-dark);
+  border: 10px solid transparent; border-image: var(--ui-panel) 7 fill / 10px stretch; image-rendering: pixelated;
+}
+.bossnote.boss { filter: drop-shadow(0 0 5px rgba(224,85,79,.6)); }
+.bossnote.boss b { color: #9a2a22; }
+.plate__boss { display: block; font-size: 10px; font-weight: 700; letter-spacing: 0; color: #9a2a22; margin-top: 1px; }
 .shopgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
 .shopcard {
   padding: 12px; display: flex; flex-direction: column; gap: 7px; color: var(--ink-dark);

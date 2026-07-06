@@ -67,6 +67,7 @@ const cs: Dict = {
   'shop.wins': 'výher',
   'shop.remove': 'Odebrat',
   'shop.upgrade': 'Vylepšit (+1/+1)',
+  'shop.nextFoe': 'Soupeř',
   // battle
   'battle.you': 'TY',
   'battle.bot': 'BOT',
@@ -94,7 +95,7 @@ const cs: Dict = {
   // rarities
   'rar.common': 'běžná', 'rar.uncommon': 'neobvyklá', 'rar.rare': 'vzácná', 'rar.epic': 'epická', 'rar.legendary': 'legendární',
   // keywords
-  'kw.charge': 'Nájezd', 'kw.fragile': 'Křehkost',
+  'kw.charge': 'Nájezd', 'kw.fragile': 'Křehkost', 'kw.thorns': 'Trny', 'kw.bloodthirst': 'Krvežíznivost',
   // sides
   'side.A': 'Ty', 'side.B': 'Bot',
   // terrain
@@ -140,6 +141,9 @@ const cs: Dict = {
   'card.shover': 'Postrkovač', 'card.sapper': 'Zákopník', 'card.cleric': 'Klerik', 'card.hexer': 'Kletbář',
   'card.sniper': 'Odstřelovač', 'card.bouncer': 'Vyhazovač', 'card.silencer': 'Umlčovač', 'card.summoner': 'Přivolávač',
   'card.warlord': 'Válečník', 'card.plague': 'Morová vrána', 'card.archmage': 'Arcimág', 'card.titan': 'Titán',
+  'card.swarmling': 'Roj', 'card.queen_swarm': 'Rojová královna', 'card.queen_thorn': 'Trnová královna',
+  'card.queen_blood': 'Krvavá královna', 'card.queen_fire': 'Ohnivá královna', 'card.queen_war': 'Velící královna',
+  'card.queen_titan': 'Titánská královna',
 };
 
 const en: Dict = {
@@ -158,6 +162,7 @@ const en: Dict = {
   'shop.wins': 'wins',
   'shop.remove': 'Remove',
   'shop.upgrade': 'Upgrade (+1/+1)',
+  'shop.nextFoe': 'Foe',
   'battle.you': 'YOU',
   'battle.bot': 'BOT',
   'battle.turn': 'Turn',
@@ -181,7 +186,7 @@ const en: Dict = {
   'end.summary': 'Battles won: {wins} / {max}',
   'end.newRun': 'New run',
   'rar.common': 'common', 'rar.uncommon': 'uncommon', 'rar.rare': 'rare', 'rar.epic': 'epic', 'rar.legendary': 'legendary',
-  'kw.charge': 'Charge', 'kw.fragile': 'Fragile',
+  'kw.charge': 'Charge', 'kw.fragile': 'Fragile', 'kw.thorns': 'Thorns', 'kw.bloodthirst': 'Bloodthirst',
   'side.A': 'You', 'side.B': 'Bot',
   'terrain.mine': 'a mine',
   'trig.deploy': 'Deploy', 'trig.death': 'Death', 'trig.wound': 'Wound', 'trig.onHeal': 'On-Heal',
@@ -219,6 +224,9 @@ const en: Dict = {
   'card.shover': 'Shover', 'card.sapper': 'Sapper', 'card.cleric': 'Cleric', 'card.hexer': 'Hexer',
   'card.sniper': 'Sniper', 'card.bouncer': 'Bouncer', 'card.silencer': 'Silencer', 'card.summoner': 'Summoner',
   'card.warlord': 'Warlord', 'card.plague': 'Plague Crow', 'card.archmage': 'Archmage', 'card.titan': 'Titan',
+  'card.swarmling': 'Swarmling', 'card.queen_swarm': 'Swarm Queen', 'card.queen_thorn': 'Thorn Queen',
+  'card.queen_blood': 'Blood Queen', 'card.queen_fire': 'Fire Queen', 'card.queen_war': 'War Queen',
+  'card.queen_titan': 'Titan Queen',
 };
 
 const STRINGS: Record<Lang, Dict> = { cs, en };

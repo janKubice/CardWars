@@ -7,8 +7,31 @@ import type { CardDef } from '../engine/types.ts';
 // ─────────────────────────────────────────────────────────────────────────
 
 export const CARD_DEFS: CardDef[] = [
-  // Královna — cíl hry. HP vysoké, malý útok, zatím bez signature schopnosti.
+  // Královna — cíl hry. HP vysoké, malý útok.
   { id: 'queen', name: 'Královna', rarity: 'legendary', cost: 0, hp: 30, attack: 1, range: 1, isQueen: true },
+
+  // Token pro Rojovou královnu
+  { id: 'swarmling', name: 'Roj', rarity: 'common', cost: 0, hp: 1, attack: 1, range: 1, tags: ['token'] },
+
+  // ── Bossové Královny (soupeř v pozdějších ante) ──
+  {
+    id: 'queen_swarm', name: 'Rojová královna', rarity: 'legendary', cost: 0, hp: 32, attack: 1, range: 1, isQueen: true,
+    abilities: [{ trigger: 'upkeepStart', effect: 'summon', target: 'none', params: { defId: 'swarmling' } }],
+  },
+  { id: 'queen_thorn', name: 'Trnová královna', rarity: 'legendary', cost: 0, hp: 34, attack: 1, range: 1, isQueen: true, keywords: ['thorns'] },
+  { id: 'queen_blood', name: 'Krvavá královna', rarity: 'legendary', cost: 0, hp: 32, attack: 2, range: 1, isQueen: true, keywords: ['bloodthirst'] },
+  {
+    id: 'queen_fire', name: 'Ohnivá královna', rarity: 'legendary', cost: 0, hp: 30, attack: 1, range: 1, isQueen: true,
+    abilities: [{ trigger: 'upkeepStart', effect: 'damage', target: 'allEnemies', params: { value: 1 } }],
+  },
+  {
+    id: 'queen_war', name: 'Velící královna', rarity: 'legendary', cost: 0, hp: 32, attack: 2, range: 1, isQueen: true,
+    abilities: [{ trigger: 'aura', effect: 'buff', target: 'around', params: { atk: 1, side: 'ally' } }],
+  },
+  {
+    id: 'queen_titan', name: 'Titánská královna', rarity: 'legendary', cost: 0, hp: 44, attack: 3, range: 1, isQueen: true, keywords: ['thorns'],
+    abilities: [{ trigger: 'upkeepStart', effect: 'summon', target: 'none', params: { defId: 'swarmling' } }],
+  },
 
   // ── Common ──
   { id: 'recruit', name: 'Rekrut', rarity: 'common', cost: 1, hp: 2, attack: 2, range: 1 },

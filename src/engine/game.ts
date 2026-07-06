@@ -21,6 +21,8 @@ export interface GameConfig {
   decks: Record<PlayerId, string[]>;
   levels?: Record<PlayerId, Record<string, number>>;
   queenId?: string;
+  /** id Královny per hráč (boss soupeře); má přednost před queenId */
+  queens?: Record<PlayerId, string>;
 }
 
 export interface ActionResult {
@@ -162,6 +164,16 @@ export class GameEngine {
         this.runner.drain();
       }
     }
+
+    // Trny: kdo zaútočí zblízka na kartu s 'thorns', dostane 2 dmg.
+    if (!this.state.winner && dist === 1) {
+      const t3 = this.state.cards.get(targetUid);
+      const a3 = this.state.cards.get(attackerUid);
+      if (t3?.keywords.includes('thorns') && a3?.zone === 'board') {
+        this.runner.enqueue({ type: 'damage', uid: attackerUid, amount: 2, sourceUid: targetUid });
+        this.runner.drain();
+      }
+    }
     return OK;
   }
 
@@ -288,13 +300,15 @@ export class GameEngine {
   // ── Sestavení hry ─────────────────────────────────────────────────────
   private setup(config: GameConfig): void {
     const s = this.state;
-    const queenId = config.queenId ?? 'queen';
+    const fallback = config.queenId ?? 'queen';
+    const qA = config.queens?.A ?? fallback;
+    const qB = config.queens?.B ?? fallback;
     const opening = config.openingHand ?? 3;
 
     // Královny na střed domovského okraje.
     const midCol = Math.floor(s.cols / 2);
-    this.placeStartingQueen('A', queenId, { row: s.rows - 1, col: midCol });
-    this.placeStartingQueen('B', queenId, { row: 0, col: midCol });
+    this.placeStartingQueen('A', qA, { row: s.rows - 1, col: midCol });
+    this.placeStartingQueen('B', qB, { row: 0, col: midCol });
 
     // Balíčky (zamíchané) a úvodní ruce.
     for (const pid of ['A', 'B'] as PlayerId[]) {

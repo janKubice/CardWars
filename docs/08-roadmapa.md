@@ -53,11 +53,11 @@ Cíl: **jeden hratelný souboj** na desce 7×6, žádná ekonomika, pevný balí
 
 ## Fáze 3 – Hloubka a šťáva
 
-- [ ] Bossové Královny se signature schopnostmi.
+- [x] Bossové Královny se signature schopnostmi (Rojová/Trnová/Krvavá/Ohnivá/Velící/Titánská) podle ante, telegrafované v obchodě. Nové keywordy Trny + Krvežíznivost.
+- [x] Zpětná vazba UI: animace zásahů/výpadu/smrti, plovoucí čísla, sekvenční tah bota (hotovo v předchozích fázích).
 - [ ] Combo motory (extra pokládání, řetězení výbuchů).
 - [ ] Chytřejší bot (mělké prohledávání, obtížnostní páky).
 - [ ] Dotáhnout pool ke 100+ kartám.
-- [ ] Zpětná vazba UI: animace zásahů, telegrafování směrových efektů, náhledy dosahu.
 
 ---
 

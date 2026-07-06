@@ -58,7 +58,18 @@ export interface RunState {
   rng: RngState;
 }
 
-const BUYABLE: CardDef[] = CARD_DEFS.filter((d) => !d.isQueen);
+const BUYABLE: CardDef[] = CARD_DEFS.filter((d) => !d.isQueen && !(d.tags ?? []).includes('token'));
+
+// Boss Královny soupeře podle ante (mezi obyčejnými, finále = Titánská).
+const BOSS_BY_ANTE: string[] = [
+  'queen', 'queen_swarm', 'queen', 'queen_thorn',
+  'queen_fire', 'queen_blood', 'queen_war', 'queen_titan',
+];
+
+/** Id Královny soupeře pro dané ante. */
+export function bossQueenFor(ante: number): string {
+  return BOSS_BY_ANTE[Math.min(ante, BOSS_BY_ANTE.length) - 1] ?? 'queen';
+}
 const BY_RARITY: Record<Rarity, CardDef[]> = groupByRarity(BUYABLE);
 
 function groupByRarity(defs: CardDef[]): Record<Rarity, CardDef[]> {
@@ -185,7 +196,8 @@ export function makeBattleConfig(run: RunState): GameConfig {
     B: botDeck(run.rng, run.ante),
   };
   const levels: Record<PlayerId, Record<string, number>> = { A: { ...run.levels }, B: {} };
-  return { library: LIBRARY, decks, levels, seed: nextInt(run.rng, 1e9) };
+  const queens: Record<PlayerId, string> = { A: 'queen', B: bossQueenFor(run.ante) };
+  return { library: LIBRARY, decks, levels, queens, seed: nextInt(run.rng, 1e9) };
 }
 
 export function onBattleWin(run: RunState): void {

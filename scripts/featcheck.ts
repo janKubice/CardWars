@@ -104,5 +104,30 @@ runner2.enqueue({ type: 'destroy', uid: rec2.uid });
 runner2.drain();
 check('padlá karta z balíčku jde do odhozu', pA.discard.includes('recruit'));
 
-console.log(failed === 0 ? '\nOK ✅ vše OK (aura, aktivace, efekty, recyklace odhozu).' : `\nCHYBA: ${failed} kontrol selhalo.`);
+// ── BOSS: TRNY — útočník zblízka na trnovou Královnu dostane dmg ──
+const e3 = new GameEngine({ library: LIBRARY, decks: { A: [], B: [] }, seed: 5, queens: { A: 'queen', B: 'queen_thorn' } });
+const st3 = e3.state;
+st3.active = 'A';
+st3.players.A.energy = 9;
+const brute = instantiate(st3, 'brute', 'A', 'board');
+placeOnGrid(st3, brute.uid, { row: 1, col: 3 });
+brute.justPlayed = false;
+const thornQueen = e3.boardCardsOf('B').find((c) => c.isQueen);
+const bruteHp0 = brute.hp;
+if (thornQueen) e3.attack(brute.uid, thornQueen.uid);
+check('trny: útočník zblízka na trnovou Královnu dostane dmg', brute.hp < bruteHp0 - 1);
+
+// ── BOSS: KRVEŽÍZNIVOST — Krvavá Královna se léčí za padlou nepřátelskou kartu ──
+const e4 = new GameEngine({ library: LIBRARY, decks: { A: [], B: [] }, seed: 6, queens: { A: 'queen', B: 'queen_blood' } });
+const st4 = e4.state;
+const bloodQueen = e4.boardCardsOf('B').find((c) => c.isQueen);
+if (bloodQueen) bloodQueen.hp = 10;
+const victim2 = instantiate(st4, 'recruit', 'A', 'board', true);
+placeOnGrid(st4, victim2.uid, { row: 3, col: 3 });
+const runner4 = new EffectRunner(st4);
+runner4.enqueue({ type: 'destroy', uid: victim2.uid });
+runner4.drain();
+check('krvežíznivost: boss se léčí za padlou nepřátelskou kartu', bloodQueen?.hp === 12);
+
+console.log(failed === 0 ? '\nOK ✅ vše OK (aura, aktivace, efekty, recyklace, bossové).' : `\nCHYBA: ${failed} kontrol selhalo.`);
 if (failed > 0) process.exit(1);

@@ -53,7 +53,7 @@ const ART_MAP: Record<string, string> = {
   zealot: 'swordWood', healer: 'potionR', zapper: 'wandGreen', slinger: 'bow', squire: 'shieldBronze',
   brute: 'hammer', scout: 'bow', shover: 'shieldBlue', sapper: 'axe', cleric: 'potionR', hexer: 'wandRed',
   sniper: 'bow', bouncer: 'shieldGreen', silencer: 'wandGreen', summoner: 'wandGreen', warlord: 'swordSteel',
-  plague: 'potionY', archmage: 'shieldPurple', titan: 'hammer',
+  plague: 'potionY', archmage: 'shieldPurple', titan: 'hammer', swarmling: 'swordWood',
 };
 
 const frames: Record<string, string> = {};

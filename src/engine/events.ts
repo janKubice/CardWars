@@ -159,6 +159,15 @@ export class EffectRunner {
     if (c.fromDeck && !c.isQueen) this.state.players[c.owner].discard.push(c.defId);
     pushLog(this.state, 'destroy', { card: c.defId });
 
+    // Krvežíznivost: nepřátelská Královna s 'bloodthirst' se léčí za padlou kartu.
+    if (!c.isQueen) {
+      for (const q of this.state.cards.values()) {
+        if (q.isQueen && q.zone === 'board' && q.owner !== c.owner && q.keywords.includes('bloodthirst')) {
+          this.enqueue({ type: 'heal', uid: q.uid, amount: 2 });
+        }
+      }
+    }
+
     // Skon (deathrattle)
     this.enqueue({ type: 'fireTrigger', uid, trigger: TRIGGERS.death, data: { pos: deadPos } });
 

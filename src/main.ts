@@ -9,7 +9,7 @@ import { t, cardName, formatLog, getLang, setLang, type Lang } from './i18n/inde
 import {
   createRun, makeBattleConfig, startBattle, onBattleWin, onBattleLoss,
   buy, reroll, removeCard, upgrade, canUpgrade, upgradeCost,
-  deckSummary, cardDef, REMOVE_COST, MAX_ANTE, MAX_LEVEL,
+  deckSummary, cardDef, bossQueenFor, REMOVE_COST, MAX_ANTE, MAX_LEVEL,
   type RunState,
 } from './run/run.ts';
 
@@ -37,9 +37,9 @@ const CARD_ART: Record<string, string> = {
   sniper: '🎯', bouncer: '🚪', silencer: '🤫', summoner: '🌀', warlord: '🎗️', plague: '🐦‍⬛',
   archmage: '🧙', titan: '🗿',
 };
-// pixel-art ikona ze sheetu; Královna má korunu, jinak fallback na emoji
+// pixel-art ikona ze sheetu; Královna (i boss) má korunu, jinak fallback na emoji
 function cardArt(defId: string): string {
-  if (defId === 'queen') return '<span class="artemoji">👑</span>';
+  if (defId === 'queen' || defId.startsWith('queen_')) return '<span class="artemoji">👑</span>';
   const uri = iconFor(defId);
   if (uri) return `<span class="spr" style="background-image:url(${uri})"></span>`;
   return `<span class="artemoji">${CARD_ART[defId] ?? '❔'}</span>`;
@@ -257,8 +257,14 @@ function playerPlate(side: PlayerId): string {
   const p = b.engine.state.players[side];
   const you = side === HUMAN;
   const active = b.engine.state.active === side;
+  // jméno bosse (soupeřova Královna, když není obyčejná)
+  let boss = '';
+  if (!you) {
+    const q = b.engine.boardCardsOf(side).find((c) => c.isQueen);
+    if (q && q.defId !== 'queen') boss = `<span class="plate__boss" title="${escapeAttr(describeCard(q))}">${escapeHtml(cardName(q.defId))}</span>`;
+  }
   return `<div class="plate ${you ? 'plate--you' : 'plate--bot'} ${active ? 'active' : ''}">
-      <span class="plate__who">${you ? t('battle.you') : t('battle.bot')}</span>
+      <span class="plate__who">${you ? t('battle.you') : t('battle.bot')}${boss}</span>
       ${pips(p.energy, p.maxEnergy)}
     </div>`;
 }
@@ -351,6 +357,12 @@ function renderShop(): string {
         <span class="deckrow__btns">${upBtn}<button class="mini" data-action="remove" data-def="${d.defId}" ${r.gold >= REMOVE_COST ? '' : 'disabled'} title="${t('shop.remove')}">−🪙${REMOVE_COST}</button></span>
       </div>`;
   }).join('');
+  const bossDef = cardDef(bossQueenFor(r.ante));
+  const bossAbil = describeDef(bossDef);
+  const isBoss = bossDef.id !== 'queen';
+  const bossNote = `<div class="bossnote ${isBoss ? 'boss' : ''}">
+      ${isBoss ? '👑💀' : '👑'} ${t('shop.nextFoe')} · Ante ${r.ante}: <b>${escapeHtml(cardName(bossDef.id))}</b>${bossAbil ? ` — <span class="muted">${escapeHtml(bossAbil)}</span>` : ''}
+    </div>`;
   return `${langBar(true)}
     <div class="shop">
       <div class="shopbar">
@@ -359,6 +371,7 @@ function renderShop(): string {
         <span class="gold">🪙 ${r.gold}</span>
         <span class="muted">${r.wins} ${t('shop.wins')}</span>
       </div>
+      ${bossNote}
       <div class="shopgrid">${cards}</div>
       <div class="shopactions">
         <button class="ghost" data-action="reroll" ${r.gold >= r.rerollCost ? '' : 'disabled'}>🔄 ${t('shop.reroll')} 🪙${r.rerollCost}</button>
