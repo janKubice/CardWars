@@ -1,6 +1,11 @@
 import framesUrl from '../../assets/Modular_Fantasy_Cards_Spritesheet.png';
 import iconsUrl from '../../assets/pixelCardAssest_V01.png';
 import homeUrl from '../../assets/01_TravelBookLite/Sprites/UI_TravelBook_IconHome01a.png';
+import panelUrl from '../../assets/01_TravelBookLite/Sprites/UI_TravelBook_Popup01a.png';
+import slotUrl from '../../assets/01_TravelBookLite/Sprites/UI_TravelBook_Slot01a.png';
+import coverUrl from '../../assets/01_TravelBookLite/Sprites/UI_TravelBook_BookCover01a.png';
+import coinUrl from '../../assets/01_TravelBookLite/Sprites/UI_TravelBook_IconCoin01a.png';
+import energyUrl from '../../assets/01_TravelBookLite/Sprites/UI_TravelBook_IconEnergy01a.png';
 import type { PlayerId } from '../engine/index.ts';
 
 // Nařezání spritesheetů na jednotlivé PNG (data URI) za běhu přes canvas.
@@ -78,8 +83,14 @@ export async function initSprites(): Promise<void> {
   const [framesImg, iconsImg] = await Promise.all([load(framesUrl), load(iconsUrl)]);
   if (framesImg) for (const [name, [x, y]] of Object.entries(FRAME_SRC)) frames[name] = slice(framesImg, x, y, FW, FH);
   if (iconsImg) for (const [name, [x, y, w, h]] of Object.entries(ICON_SRC)) icons[name] = slice(iconsImg, x, y, w, h);
-  // UI kit ikony → CSS proměnné
-  document.documentElement.style.setProperty('--ic-home', `url(${homeUrl})`);
+  // UI kit → CSS proměnné (pergamenové panely, tmavé sloty, ikony)
+  const root = document.documentElement.style;
+  root.setProperty('--ui-panel', `url(${panelUrl})`);
+  root.setProperty('--ui-slot', `url(${slotUrl})`);
+  root.setProperty('--ui-cover', `url(${coverUrl})`);
+  root.setProperty('--ic-home', `url(${homeUrl})`);
+  root.setProperty('--ic-coin', `url(${coinUrl})`);
+  root.setProperty('--ic-energy', `url(${energyUrl})`);
 }
 
 /** Rámeček karty podle vlastníka (Královna zlatý). */
