@@ -11,7 +11,8 @@
     "typecheck": "tsc --noEmit",
     "smoke": "node --experimental-strip-types scripts/smoke.ts",
     "runsmoke": "node --experimental-strip-types scripts/runsmoke.ts",
-    "featcheck": "node --experimental-strip-types scripts/featcheck.ts"
+    "featcheck": "node --experimental-strip-types scripts/featcheck.ts",
+    "botcompare": "node --experimental-strip-types scripts/botcompare.ts"
   },
   "devDependencies": {
     "playwright": "^1.61.1",
