@@ -101,7 +101,7 @@ const cs: Dict = {
   // terrain
   'terrain.mine': 'minu',
   // triggers
-  'trig.deploy': 'Vylož', 'trig.death': 'Skon', 'trig.wound': 'Zranění', 'trig.onHeal': 'Vyléčení',
+  'trig.deploy': 'Vylož', 'trig.allyDeploy': 'Když vyložíš kartu', 'trig.death': 'Skon', 'trig.wound': 'Zranění', 'trig.onHeal': 'Vyléčení',
   'trig.onShield': 'Zaštítění', 'trig.attack': 'Útok', 'trig.kill': 'Zabití', 'trig.upkeepStart': 'Úsvit',
   'trig.upkeepEnd': 'Soumrak', 'trig.countdown': 'Odpočet', 'trig.aura': 'Aura', 'trig.active': 'Aktivace',
   // directions
@@ -149,6 +149,7 @@ const cs: Dict = {
   'card.queen_titan': 'Titánská královna',
   'card.ritualist': 'Ritualista', 'card.collector': 'Sběratel', 'card.catalyst': 'Katalyzátor',
   'card.pyromaniac': 'Pyromaniak', 'card.grandmaster': 'Velmistr',
+  'card.conductor': 'Dirigent', 'card.sparkmage': 'Jiskřič', 'card.grenadier': 'Granátník',
 };
 
 const en: Dict = {
@@ -194,7 +195,7 @@ const en: Dict = {
   'kw.charge': 'Charge', 'kw.fragile': 'Fragile', 'kw.thorns': 'Thorns', 'kw.bloodthirst': 'Bloodthirst',
   'side.A': 'You', 'side.B': 'Bot',
   'terrain.mine': 'a mine',
-  'trig.deploy': 'Deploy', 'trig.death': 'Death', 'trig.wound': 'Wound', 'trig.onHeal': 'On-Heal',
+  'trig.deploy': 'Deploy', 'trig.allyDeploy': 'When you play a card', 'trig.death': 'Death', 'trig.wound': 'Wound', 'trig.onHeal': 'On-Heal',
   'trig.onShield': 'On-Shield', 'trig.attack': 'Attack', 'trig.kill': 'Kill', 'trig.upkeepStart': 'Upkeep',
   'trig.upkeepEnd': 'End', 'trig.countdown': 'Countdown', 'trig.aura': 'Aura', 'trig.active': 'Active',
   'dir.forward': 'forward', 'dir.back': 'back', 'dir.left': 'left', 'dir.right': 'right',
@@ -237,6 +238,7 @@ const en: Dict = {
   'card.queen_titan': 'Titan Queen',
   'card.ritualist': 'Ritualist', 'card.collector': 'Collector', 'card.catalyst': 'Catalyst',
   'card.pyromaniac': 'Pyromaniac', 'card.grandmaster': 'Grandmaster',
+  'card.conductor': 'Conductor', 'card.sparkmage': 'Sparkmage', 'card.grenadier': 'Grenadier',
 };
 
 const STRINGS: Record<Lang, Dict> = { cs, en };

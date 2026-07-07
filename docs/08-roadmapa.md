@@ -55,8 +55,8 @@ Cíl: **jeden hratelný souboj** na desce 7×6, žádná ekonomika, pevný balí
 
 - [x] Bossové Královny se signature schopnostmi (Rojová/Trnová/Krvavá/Ohnivá/Velící/Titánská) podle ante, telegrafované v obchodě. Nové keywordy Trny + Krvežíznivost.
 - [x] Zpětná vazba UI: animace zásahů/výpadu/smrti, plovoucí čísla, sekvenční tah bota (hotovo v předchozích fázích).
-- [ ] Combo motory (extra pokládání, řetězení výbuchů).
-- [ ] Chytřejší bot (mělké prohledávání, obtížnostní páky).
+- [x] Combo motory: nový trigger **allyDeploy** („kdykoli vyložíš kartu") krmený energií — karty Dirigent (roste s vyložením) a Jiskřič (zásah za vyložení); **řetězení výbuchů** přes Explosive death-bombery (Zákopník/Granátník). Opraveny Skon-triggery (dříve se na padlé kartě nespouštěly). Test `npm run featcheck`.
+- [~] Chytřejší bot: obrana Královny + poziční pokládání + head-to-head test `npm run botcompare` (~74 % vs greedy). Zbývá mělké prohledávání a obtížnostní páky.
 - [ ] Dotáhnout pool ke 100+ kartám.
 
 ---

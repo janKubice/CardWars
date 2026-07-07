@@ -12,6 +12,8 @@ export type TriggerType = string;
 
 export const TRIGGERS = {
   deploy: 'deploy',
+  /** vyvolá se na mých OSTATNÍCH jednotkách, když vyložím kartu (combo motor) */
+  allyDeploy: 'allyDeploy',
   death: 'death',
   wound: 'wound',
   onHeal: 'onHeal',

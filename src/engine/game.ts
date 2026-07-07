@@ -133,6 +133,13 @@ export class GameEngine {
     }
 
     this.runner.enqueue({ type: 'fireTrigger', uid: cardUid, trigger: TRIGGERS.deploy });
+    // Combo motor: mé OSTATNÍ jednotky reagují na vyložení karty (allyDeploy).
+    // Krmí to energie karty (víc vyložení = víc spuštění) — „extra pokládání".
+    for (const other of this.boardCardsOf(c.owner)) {
+      if (other.uid !== cardUid) {
+        this.runner.enqueue({ type: 'fireTrigger', uid: other.uid, trigger: TRIGGERS.allyDeploy, data: { deployedUid: cardUid } });
+      }
+    }
     this.runner.drain();
     return OK;
   }

@@ -189,7 +189,10 @@ export class EffectRunner {
 
   private resolveTrigger(uid: number, trigger: string, data?: TriggerData): void {
     const c = this.card(uid);
-    if (!c || c.zone === 'dead') return;
+    if (!c) return;
+    // Skon (death) se pouští PRÁVĚ na padlé kartě — ta je už 'dead'; ostatní
+    // triggery smí spustit jen živá karta na desce.
+    if (c.zone === 'dead' && trigger !== TRIGGERS.death) return;
     for (const ability of c.abilities) {
       if (ability.trigger === trigger) {
         this.enqueue({ type: 'runAbility', ability, sourceUid: uid, data });

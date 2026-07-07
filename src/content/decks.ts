@@ -30,6 +30,7 @@ const STARTER: string[] = [
   'sniper', 'bouncer', 'silencer', 'summoner',
   'warlord', 'plague', 'archmage', 'titan',
   'ritualist', 'collector', 'catalyst', 'pyromaniac', 'grandmaster',
+  'conductor', 'sparkmage', 'grenadier',
 ];
 
 export const STARTER_DECKS: Record<PlayerId, string[]> = {

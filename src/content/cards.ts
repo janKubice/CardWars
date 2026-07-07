@@ -193,6 +193,23 @@ export const CARD_DEFS: CardDef[] = [
     id: 'grandmaster', name: 'Velmistr', rarity: 'epic', cost: 4, hp: 3, attack: 3, range: 1,
     abilities: [{ trigger: 'deploy', effect: 'energy', target: 'none', params: { value: 3 } }],
   },
+
+  // ── Combo motory: „extra pokládání" (allyDeploy) + „řetězení výbuchů" ──
+  // Dirigent roste za KAŽDOU kartu, kterou tento tah/hru vyložíš (škáluje s energií).
+  {
+    id: 'conductor', name: 'Dirigent', rarity: 'rare', cost: 3, hp: 4, attack: 1, range: 1,
+    abilities: [{ trigger: 'allyDeploy', effect: 'buff', target: 'self', params: { atk: 1 } }],
+  },
+  // Jiskřič pálí náhodného nepřítele pokaždé, když něco vyložíš — spellslinger combo.
+  {
+    id: 'sparkmage', name: 'Jiskřič', rarity: 'epic', cost: 4, hp: 3, attack: 1, range: 2,
+    abilities: [{ trigger: 'allyDeploy', effect: 'damage', target: 'randomEnemy', params: { value: 1 } }],
+  },
+  // Granátník: další Explosive death-bomber — výbuchy se řetězí (sapper → granátník → …).
+  {
+    id: 'grenadier', name: 'Granátník', rarity: 'uncommon', cost: 2, hp: 2, attack: 1, range: 1, tags: ['Explosive'],
+    abilities: [{ trigger: 'death', effect: 'damage', target: 'aroundVictim', params: { value: 2, side: 'any' } }],
+  },
 ];
 
 export const LIBRARY: Record<string, CardDef> = Object.fromEntries(CARD_DEFS.map((d) => [d.id, d]));

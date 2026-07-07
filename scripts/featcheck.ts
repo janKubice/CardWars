@@ -152,5 +152,34 @@ getEffect('buff')?.(runnerB.makeApi(pyro.uid), { atk: 1, tag: 'Explosive' }, tag
 runnerB.drain();
 check('kombo: tag synergie buffne Explosive spojence (+1 útok)', mlr.baseAttack === mlrAtk + 1);
 
-console.log(failed === 0 ? '\nOK ✅ vše OK (aura, aktivace, efekty, recyklace, bossové, kombo).' : `\nCHYBA: ${failed} kontrol selhalo.`);
+// ── COMBO MOTOR: allyDeploy — Dirigent roste s každou vyloženou kartou ──
+const e6 = new GameEngine({ library: LIBRARY, decks: { A: [], B: [] }, seed: 8 });
+const st6 = e6.state;
+st6.active = 'A';
+st6.players.A.energy = 9;
+const cond = instantiate(st6, 'conductor', 'A', 'board');
+placeOnGrid(st6, cond.uid, { row: 3, col: 3 });
+const condAtk0 = cond.baseAttack;
+const handCard = instantiate(st6, 'recruit', 'A', 'hand');
+st6.players.A.hand.push(handCard.uid);
+const played = e6.play(handCard.uid, { row: 3, col: 4 }); // sousedí s Dirigentem
+check('allyDeploy: vyložení karty projde', played.ok);
+check('allyDeploy: Dirigent získá +1 útok za vyloženou kartu', cond.baseAttack === condAtk0 + 1);
+
+// ── COMBO MOTOR: řetězení výbuchů — sapper → granátník → nepřítel ──
+const e7 = new GameEngine({ library: LIBRARY, decks: { A: [], B: [] }, seed: 9 });
+const st7 = e7.state;
+const sap = instantiate(st7, 'sapper', 'A', 'board');
+placeOnGrid(st7, sap.uid, { row: 2, col: 2 });
+const gren = instantiate(st7, 'grenadier', 'A', 'board');
+placeOnGrid(st7, gren.uid, { row: 2, col: 3 }); // v dosahu výbuchu sappera
+const chainFoe = instantiate(st7, 'recruit', 'B', 'board');
+placeOnGrid(st7, chainFoe.uid, { row: 2, col: 4 }); // jen v dosahu granátníka, ne sappera
+const runner7 = new EffectRunner(st7);
+runner7.enqueue({ type: 'destroy', uid: sap.uid });
+runner7.drain();
+check('řetězení: první výbuch zabije druhého bombera', gren.zone === 'dead');
+check('řetězení: druhý výbuch zasáhne vzdálenějšího nepřítele', chainFoe.zone === 'dead');
+
+console.log(failed === 0 ? '\nOK ✅ vše OK (aura, aktivace, efekty, recyklace, bossové, kombo, combo motory).' : `\nCHYBA: ${failed} kontrol selhalo.`);
 if (failed > 0) process.exit(1);
