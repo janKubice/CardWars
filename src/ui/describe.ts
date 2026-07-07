@@ -13,6 +13,13 @@ function dir(params: Record<string, unknown> | undefined): string {
   return t('dir.' + String(params?.direction ?? 'forward'));
 }
 
+/** Lokalizovaný název kmene/tagu (Explosive→Výbušný…); neznámý tag zůstane jak je. */
+export function tagLabel(tag: string): string {
+  const key = 'tag.' + tag;
+  const val = t(key);
+  return val === key ? tag : val;
+}
+
 function effectText(a: AbilityDef): string {
   const p = a.params ?? {};
   switch (a.effect) {
@@ -48,7 +55,7 @@ function targetText(a: AbilityDef): string {
     case 'enemyQueen': return t('tg.enemyQueen');
     case 'randomEnemy': return t('tg.randomEnemy');
     case 'lowestHpEnemy': return t('tg.lowestHpEnemy');
-    case 'alliesTag': return t('tg.alliesTag', { tag: String(a.params?.tag ?? '') });
+    case 'alliesTag': return t('tg.alliesTag', { tag: tagLabel(String(a.params?.tag ?? '')) });
     default: return a.target;
   }
 }

@@ -54,6 +54,27 @@ const ART_MAP: Record<string, string> = {
   brute: 'hammer', scout: 'bow', shover: 'shieldBlue', sapper: 'axe', cleric: 'potionR', hexer: 'wandRed',
   sniper: 'bow', bouncer: 'shieldGreen', silencer: 'wandGreen', summoner: 'wandGreen', warlord: 'swordSteel',
   plague: 'potionY', archmage: 'shieldPurple', titan: 'hammer', swarmling: 'swordWood',
+  // kombo karty
+  ritualist: 'wandRed', collector: 'coin', catalyst: 'wandGreen', pyromaniac: 'wandRed', grandmaster: 'star',
+  conductor: 'wandGreen', sparkmage: 'wandRed', grenadier: 'axe',
+  // bossové Královny
+  queen_swarm: 'star', queen_thorn: 'star', queen_blood: 'star', queen_fire: 'star', queen_war: 'star', queen_titan: 'star',
+  // rozšíření poolu (Beast/Undead + doplnění)
+  wolf: 'swordWood', skeleton: 'swordWood', wardog: 'swordWood', stoneguard: 'shieldBronze',
+  javelineer: 'spear', torchbearer: 'wandRed', initiate: 'shieldBronze', bruiser: 'hammer',
+  hound: 'swordWood', crossbowman: 'bow', footsoldier: 'swordSteel', acolyte: 'potionG',
+  skirmisher: 'swordSteel', ratling: 'swordWood', houndmaster: 'swordWood', packleader: 'swordWood',
+  necromancer: 'wandGreen', boneguard: 'shieldBronze', pyrokin: 'wandRed', warpriest: 'shieldGreen',
+  duelist: 'swordSteel', harpooner: 'spear', warhorn: 'shieldGreen', sister: 'potionR',
+  impaler: 'spear', bombthrower: 'wandRed', recruiter: 'swordSteel', spearguard: 'spear',
+  windrunner: 'swordWood', lifebinder: 'potionR', tinkerer: 'shieldBronze', beastlord: 'swordWood',
+  lich: 'wandGreen', bombard: 'hammer', executioner: 'axe', battlemage: 'wandGreen',
+  templar: 'shieldBlue', warchief: 'shieldGreen', plaguebearer: 'potionY', windlord: 'spear',
+  enchanter: 'wandGreen', ballista: 'bow', archivist: 'coin', gravedigger: 'wandGreen',
+  firelord: 'wandRed', hydra: 'swordWood', necrolord: 'wandGreen', inferno: 'wandRed',
+  archon: 'shieldGreen', stormcaller: 'wandGreen', beastking: 'swordWood', warlock: 'wandRed',
+  guardian: 'shieldBlue', phoenix: 'wandRed', dragon: 'swordSteel', deathknight: 'swordSteel',
+  worldtree: 'potionG', reaperlord: 'axe', colossus: 'shieldBronze', oracle: 'star',
 };
 
 const frames: Record<string, string> = {};

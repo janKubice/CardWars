@@ -13,7 +13,7 @@ function load(): Lang {
     const v = localStorage.getItem(STORE_KEY);
     if (v === 'cs' || v === 'en') return v;
   } catch { /* localStorage nemusí být dostupný */ }
-  return 'cs';
+  return 'en'; // výchozí jazyk = angličtina
 }
 
 export function getLang(): Lang {
@@ -96,6 +96,33 @@ const cs: Dict = {
   'rar.common': 'běžná', 'rar.uncommon': 'neobvyklá', 'rar.rare': 'vzácná', 'rar.epic': 'epická', 'rar.legendary': 'legendární',
   // keywords
   'kw.charge': 'Nájezd', 'kw.fragile': 'Křehkost', 'kw.thorns': 'Trny', 'kw.bloodthirst': 'Krvežíznivost',
+  // tag (kmeny/synergie)
+  'tag.Explosive': 'Výbušný', 'tag.Beast': 'Zvíře', 'tag.Undead': 'Nemrtvý',
+  // tooltip
+  'tip.stats': 'cena · útok · život', 'tip.queenTerm': 'Královna', 'tip.vanilla': 'Obyčejná jednotka bez schopností.',
+  'tip.hoverHelp': 'Najeď myší na kartu pro nápovědu.',
+  // nápovědy (glosář v tooltipu)
+  'help.queen': 'Královna je cíl hry. Když padne ta tvoje, prohráváš — sejmi soupeřovu, abys vyhrál.',
+  'help.charge': 'Může útočit hned v kole, kdy ji vyložíš (bez únavy z vyložení).',
+  'help.fragile': 'Dostává o 1 poškození navíc z každého zásahu.',
+  'help.thorns': 'Kdo na ni zaútočí zblízka, dostane 2 poškození zpět.',
+  'help.bloodthirst': 'Pokaždé když padne nepřátelská jednotka, vyléčí se o 2.',
+  'help.deploy': 'Spustí se ve chvíli, kdy kartu vyložíš na desku.',
+  'help.allyDeploy': 'Spustí se pokaždé, když vyložíš jinou svou kartu (řetězí se s energií).',
+  'help.death': 'Spustí se, když tato karta padne (Skon).',
+  'help.wound': 'Spustí se, když tato karta dostane poškození.',
+  'help.onHeal': 'Spustí se, když je tato karta vyléčena.',
+  'help.onShield': 'Spustí se, když tato karta dostane štít.',
+  'help.attack': 'Spustí se, když tato karta zaútočí.',
+  'help.kill': 'Spustí se, když tato karta zabije nepřítele.',
+  'help.upkeepStart': 'Spustí se na začátku každého tvého tahu (Úsvit).',
+  'help.upkeepEnd': 'Spustí se na konci tvého tahu.',
+  'help.countdown': 'Po pár tazích odpočet vyprší, schopnost se spustí a karta pak zmizí.',
+  'help.aura': 'Trvalý efekt, který působí, dokud je karta na desce.',
+  'help.active': 'Ruční schopnost — jednou za tah ji za energii spustíš kliknutím.',
+  'help.Explosive': 'Výbušný: když padne, vybuchne a zraní okolí — může zapálit další výbušné karty (řetězení).',
+  'help.Beast': 'Zvíře: velitelé zvířat (Psovod, Pán zvířat…) posilují všechna tvá Zvířata.',
+  'help.Undead': 'Nemrtvý: nekromanti přivolávají Kostlivce a těží ze smrti jednotek.',
   // sides
   'side.A': 'Ty', 'side.B': 'Bot',
   // terrain
@@ -214,6 +241,30 @@ const en: Dict = {
   'end.newRun': 'New run',
   'rar.common': 'common', 'rar.uncommon': 'uncommon', 'rar.rare': 'rare', 'rar.epic': 'epic', 'rar.legendary': 'legendary',
   'kw.charge': 'Charge', 'kw.fragile': 'Fragile', 'kw.thorns': 'Thorns', 'kw.bloodthirst': 'Bloodthirst',
+  'tag.Explosive': 'Explosive', 'tag.Beast': 'Beast', 'tag.Undead': 'Undead',
+  'tip.stats': 'cost · attack · health', 'tip.queenTerm': 'Queen', 'tip.vanilla': 'A plain unit with no abilities.',
+  'tip.hoverHelp': 'Hover a card for help.',
+  'help.queen': 'The Queen is the win condition. If yours falls you lose — destroy the enemy Queen to win.',
+  'help.charge': 'Can attack the turn it is played (no summoning sickness).',
+  'help.fragile': 'Takes 1 extra damage from every hit.',
+  'help.thorns': 'Attackers in melee take 2 damage back.',
+  'help.bloodthirst': 'Heals 2 whenever an enemy unit dies.',
+  'help.deploy': 'Triggers the moment the card is played onto the board.',
+  'help.allyDeploy': 'Triggers each time you play another of your cards (chains with energy).',
+  'help.death': 'Triggers when this card is destroyed.',
+  'help.wound': 'Triggers when this card takes damage.',
+  'help.onHeal': 'Triggers when this card is healed.',
+  'help.onShield': 'Triggers when this card gains a shield.',
+  'help.attack': 'Triggers when this card attacks.',
+  'help.kill': 'Triggers when this card kills an enemy.',
+  'help.upkeepStart': 'Triggers at the start of each of your turns (Upkeep).',
+  'help.upkeepEnd': 'Triggers at the end of your turn.',
+  'help.countdown': 'After a few turns the countdown fires the ability, then the card is gone.',
+  'help.aura': 'A constant effect that lasts while the card is on the board.',
+  'help.active': 'A manual ability — activate once per turn for energy by clicking.',
+  'help.Explosive': 'Explosive: on death it blasts neighbors — which can set off other Explosives (chain reaction).',
+  'help.Beast': 'Beast: beast leaders (Houndmaster, Beastlord…) buff all your Beasts.',
+  'help.Undead': 'Undead: necromancers summon Skeletons and profit from units dying.',
   'side.A': 'You', 'side.B': 'Bot',
   'terrain.mine': 'a mine',
   'trig.deploy': 'Deploy', 'trig.allyDeploy': 'When you play a card', 'trig.death': 'Death', 'trig.wound': 'Wound', 'trig.onHeal': 'On-Heal',

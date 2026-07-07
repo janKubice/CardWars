@@ -15,11 +15,13 @@ page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
 page.on('pageerror', (e) => errors.push(String(e)));
 await page.goto('file://' + htmlPath);
 
-// 1) Menu
+// 1) Menu — výchozí jazyk musí být angličtina
 await page.waitForSelector('.menu');
 await page.waitForTimeout(500); // dokončit fade-in animaci
+const defaultText = (await page.locator('.menu .primary').innerText()).trim();
+const defaultEN = /New Run/i.test(defaultText);
+console.log(`menu ✓ (výchozí jazyk: ${defaultEN ? 'EN' : 'jiný: ' + defaultText})`);
 await page.screenshot({ path: resolve(__dirname, '../dist/menu.png') });
-console.log('menu ✓');
 
 // 2) Přepnutí jazyka EN → CS (ověř, že se text mění)
 await page.locator('button[data-action="lang"][data-lang="en"]').click();
@@ -43,6 +45,14 @@ const buyBtn = page.locator('.shopcard .buy:not([disabled])').first();
 if (await buyBtn.count()) { await buyBtn.click(); console.log('nákup ✓'); }
 await page.waitForTimeout(400);
 await page.screenshot({ path: resolve(__dirname, '../dist/shop.png') });
+
+// 3b) Najížděcí nápověda: hover na kartu v obchodě ukáže tooltip s popisem
+await page.locator('.shopcard').first().hover();
+await page.waitForTimeout(150);
+const tipVisible = (await page.locator('#tip:not([hidden])').count()) > 0;
+const tipText = tipVisible ? (await page.locator('#tip').innerText()).trim() : '';
+console.log(`tooltip: ${tipVisible ? 'zobrazen' : 'NE'} — "${tipText.slice(0, 46).replace(/\n/g, ' ')}"`);
+await page.screenshot({ path: resolve(__dirname, '../dist/tooltip.png') });
 
 // 4) Do boje
 await page.locator('button[data-action="tobattle"]').click();
@@ -81,5 +91,7 @@ if (queens !== 2) { console.error('CHYBA: nejsou 2 královny'); process.exit(1);
 if (shopCards !== 5) { console.error('CHYBA: obchod nemá 5 karet'); process.exit(1); }
 if (!upgraded) { console.error('CHYBA: vylepšení karty se neprojevilo'); process.exit(1); }
 if (!played) { console.error('CHYBA: nešlo vyložit kartu na desku (regrese pokládání!)'); process.exit(1); }
+if (!defaultEN) { console.error('CHYBA: výchozí jazyk není angličtina'); process.exit(1); }
+if (!tipVisible) { console.error('CHYBA: najížděcí nápověda (tooltip) se nezobrazila'); process.exit(1); }
 if (errors.length) { console.error('CHYBA konzole:', errors.slice(0, 5)); process.exit(1); }
-console.log('OK ✅ menu + jazyk + obchod + souboj fungují v prohlížeči.');
+console.log('OK ✅ menu + jazyk + tooltip + obchod + souboj fungují v prohlížeči.');

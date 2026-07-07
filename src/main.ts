@@ -1,9 +1,9 @@
 import './style.css';
-import type { CardInstance, PlayerId, Position } from './engine/index.ts';
+import type { AbilityDef, CardInstance, PlayerId, Position } from './engine/index.ts';
 import { GameEngine, key } from './engine/index.ts';
 import { stepBot } from './ai/bot.ts';
 import { LIBRARY } from './content/cards.ts';
-import { describeCard, describeDef, describeAbility } from './ui/describe.ts';
+import { describeDef, describeAbility, tagLabel } from './ui/describe.ts';
 import { initSprites, frameFor, iconFor } from './ui/sprites.ts';
 import { t, cardName, formatLog, getLang, setLang, type Lang } from './i18n/index.ts';
 import {
@@ -36,6 +36,19 @@ const CARD_ART: Record<string, string> = {
   brute: '👊', scout: '👁️', shover: '🤚', sapper: '🧨', cleric: '✝️', hexer: '🔮',
   sniper: '🎯', bouncer: '🚪', silencer: '🤫', summoner: '🌀', warlord: '🎗️', plague: '🐦‍⬛',
   archmage: '🧙', titan: '🗿',
+  ritualist: '🔯', collector: '📥', catalyst: '⚗️', pyromaniac: '🎇', grandmaster: '♟️',
+  conductor: '🎼', sparkmage: '✨', grenadier: '💣',
+  // rozšíření poolu
+  wolf: '🐺', skeleton: '💀', wardog: '🐕', stoneguard: '🗿', javelineer: '🔱', torchbearer: '🕯️',
+  initiate: '🔰', bruiser: '🥊', hound: '🐶', crossbowman: '🎯', footsoldier: '🥾', acolyte: '🕊️',
+  skirmisher: '🗡️', ratling: '🐀', houndmaster: '🦮', packleader: '🐾', necromancer: '🧟', boneguard: '☠️',
+  pyrokin: '🌋', warpriest: '⛪', duelist: '🤺', harpooner: '🪝', warhorn: '📯', sister: '⛑️',
+  impaler: '🌵', bombthrower: '🎆', recruiter: '📣', spearguard: '🛡️', windrunner: '💨', lifebinder: '🩸',
+  tinkerer: '🔧', beastlord: '🦁', lich: '👻', bombard: '💥', executioner: '🪓', battlemage: '🪄',
+  templar: '⚜️', warchief: '🪶', plaguebearer: '🦠', windlord: '🌪️', enchanter: '🎇', ballista: '🏹',
+  archivist: '📚', gravedigger: '⚰️', firelord: '🔥', hydra: '🐍', necrolord: '👑', inferno: '🔥',
+  archon: '😇', stormcaller: '⛈️', beastking: '🐯', warlock: '😈', guardian: '🛡️', phoenix: '🦅',
+  dragon: '🐉', deathknight: '🖤', worldtree: '🌲', reaperlord: '☠️', colossus: '🏛️', oracle: '🌟',
 };
 // pixel-art ikona ze sheetu; Královna (i boss) má korunu, jinak fallback na emoji
 function cardArt(defId: string): string {
@@ -50,6 +63,84 @@ const fx = document.createElement('div');
 fx.id = 'fx';
 document.body.appendChild(fx);
 let renderedUids = new Set<number>(); // pro animaci "vyložení" jen u nových karet
+
+// ── nápovědní tooltip (bohatý, srozumitelný popis karty + glosář pojmů) ──────
+const tip = document.createElement('div');
+tip.id = 'tip';
+tip.hidden = true;
+document.body.appendChild(tip);
+let tipAnchor: Element | null = null;
+
+function hideTip(): void { tip.hidden = true; tipAnchor = null; }
+function showTip(anchor: Element, html: string): void {
+  tip.innerHTML = html;
+  tip.hidden = false;
+  const r = anchor.getBoundingClientRect();
+  const tr = tip.getBoundingClientRect();
+  let left = r.left + r.width / 2 - tr.width / 2;
+  let top = r.top - tr.height - 10;                 // nad kartu
+  if (top < 8) top = r.bottom + 10;                 // pod kartu, když nahoře není místo
+  left = Math.max(8, Math.min(left, window.innerWidth - tr.width - 8));
+  top = Math.max(8, Math.min(top, window.innerHeight - tr.height - 8));
+  tip.style.left = `${left}px`;
+  tip.style.top = `${top}px`;
+}
+
+interface TipParts {
+  name: string; rarity: string; cost: number; attack: number; hp: number; maxHp?: number;
+  range: number; keywords: string[]; abilities: AbilityDef[]; tags: string[]; isQueen: boolean;
+}
+/** Glosář: každý speciální pojem karty (keyword / trigger / kmen / Královna) + jeho vysvětlení. */
+function glossaryHtml(p: TipParts): string {
+  const rows: string[] = [];
+  const seen = new Set<string>();
+  const add = (label: string, desc: string): void => {
+    if (!label || !desc || seen.has(label)) return;
+    seen.add(label);
+    rows.push(`<div class="tip__g"><b>${escapeHtml(label)}</b> ${escapeHtml(desc)}</div>`);
+  };
+  if (p.isQueen) add(t('tip.queenTerm'), t('help.queen'));
+  for (const kw of p.keywords) add(t('kw.' + kw), t('help.' + kw));
+  for (const ab of p.abilities) add(t('trig.' + ab.trigger), t('help.' + ab.trigger));
+  for (const tg of p.tags) if (tg !== 'token') add(tagLabel(tg), t('help.' + tg));
+  return rows.length ? `<div class="tip__gloss">${rows.join('')}</div>` : '';
+}
+function cardTip(p: TipParts): string {
+  const rar = `<span class="tip__rar r-txt-${p.rarity}">${escapeHtml(t('rar.' + p.rarity))}</span>`;
+  const hp = p.maxHp != null && p.maxHp !== p.hp ? `${p.hp}/${p.maxHp}` : `${p.hp}`;
+  const stats = `<span class="tip__s cost">⚡${p.cost}</span><span class="tip__s atkv">⚔${p.attack}</span><span class="tip__s hpv">❤${hp}</span>${p.range > 1 ? `<span class="tip__s rngv">🏹${p.range}</span>` : ''}`;
+  const abils = p.abilities.length
+    ? `<div class="tip__abils">${p.abilities.map((a) => `<div class="tip__ab">${escapeHtml(describeAbility(a))}</div>`).join('')}</div>`
+    : p.keywords.length || p.isQueen ? '' // keyword-only / Královnu vysvětlí glosář
+    : `<div class="tip__vanilla">${escapeHtml(t('tip.vanilla'))}</div>`;
+  return `<div class="tip__head"><span class="tip__name">${escapeHtml(p.name)}</span>${rar}</div>
+    <div class="tip__stats">${stats}</div>${abils}${glossaryHtml(p)}`;
+}
+function tipForUid(uid: number): string | null {
+  const c = battle?.engine.card(uid);
+  if (!c) return null;
+  return cardTip({ name: cardName(c.defId), rarity: rarityOf(c.defId), cost: c.cost, attack: c.attack, hp: Math.max(0, c.hp), maxHp: c.maxHp, range: c.range, keywords: c.keywords, abilities: c.abilities, tags: c.tags, isQueen: c.isQueen });
+}
+function tipForDef(defId: string): string | null {
+  const d = LIBRARY[defId];
+  if (!d) return null;
+  return cardTip({ name: cardName(d.id), rarity: d.rarity, cost: d.cost, attack: d.attack, hp: d.hp, range: d.range, keywords: d.keywords ?? [], abilities: d.abilities ?? [], tags: d.tags ?? [], isQueen: d.isQueen ?? false });
+}
+function tipHtmlFor(el: Element): string | null {
+  const ds = (el as HTMLElement).dataset;
+  if (ds.tipUid != null) return tipForUid(Number(ds.tipUid));
+  if (ds.tipDef != null) return tipForDef(ds.tipDef);
+  return null;
+}
+document.addEventListener('pointermove', (e) => {
+  const el = (e.target as HTMLElement).closest?.('[data-tip-uid],[data-tip-def]') ?? null;
+  if (el === tipAnchor) return;
+  tipAnchor = el;
+  if (!el) { hideTip(); return; }
+  const html = tipHtmlFor(el);
+  if (html) showTip(el, html); else hideTip();
+});
+window.addEventListener('scroll', hideTip, true);
 
 // ── animační pomůcky ────────────────────────────────────────────────────────
 interface Snap { row: number; col: number; hp: number; maxHp: number; }
@@ -163,15 +254,13 @@ function pieceCard(c: CardInstance, extra: string): string {
   const enter = renderedUids.has(c.uid) ? '' : 'enter';
   const cls = ['pc', c.owner === 'A' ? 'pc--a' : 'pc--b', c.isQueen ? 'pc--queen' : '', `r-${rarityOf(c.defId)}`, enter, extra]
     .filter(Boolean).join(' ');
-  const abil = c.abilities.length ? '<span class="dot">✦</span>' : '';
-  const title = describeCard(c) || cardName(c.defId);
   const atkCls = c.attack > c.baseAttack ? 'atk buffed' : 'atk';
   const frame = frameFor(c.owner, c.isQueen);
   const bg = frame ? `style="background-image:url(${frame})"` : '';
-  // jméno je v tooltipu, na desce ukazujeme jen art + staty (ať to není přeplácané)
-  return `<div class="${cls}" data-uid="${c.uid}" ${bg} title="${escapeAttr(cardName(c.defId) + (title ? ' — ' + title : ''))}">
+  // jméno + celý popis je v najížděcím tooltipu; na desce jen art + staty
+  return `<div class="${cls}" data-uid="${c.uid}" data-tip-uid="${c.uid}" ${bg}>
       ${c.isQueen ? '<span class="crown">♛</span>' : ''}
-      ${abil ? '<span class="pc__abil">✦</span>' : ''}
+      ${c.abilities.length ? '<span class="pc__abil">✦</span>' : ''}
       <div class="pc__art">${cardArt(c.defId)}</div>
       ${badges(c)}
       <div class="pc__foot"><span class="${atkCls}">${c.attack}</span><span class="hp">${Math.max(0, c.hp)}/${c.maxHp}</span></div>
@@ -241,7 +330,7 @@ function renderHand(b: BattleState): string {
     const sel = b.selection?.type === 'hand' && b.selection.uid === c.uid ? 'is-sel' : '';
     const aff = c.cost <= p.energy ? '' : 'is-dim';
     const rng = c.range > 1 ? `<span class="hrng">🏹${c.range}</span>` : '';
-    return `<div class="hslot ${sel} ${aff}" data-hand="${c.uid}" title="${escapeAttr(describeCard(c) || cardName(c.defId))}">
+    return `<div class="hslot ${sel} ${aff}" data-hand="${c.uid}" data-tip-uid="${c.uid}">
         <div class="pc pc--a hframe r-${rarityOf(c.defId)}" ${bg}>
           <span class="hcost">${c.cost}</span>${rng}
           <div class="pc__art">${cardArt(c.defId)}</div>
@@ -261,7 +350,7 @@ function playerPlate(side: PlayerId): string {
   let boss = '';
   if (!you) {
     const q = b.engine.boardCardsOf(side).find((c) => c.isQueen);
-    if (q && q.defId !== 'queen') boss = `<span class="plate__boss" title="${escapeAttr(describeCard(q))}">${escapeHtml(cardName(q.defId))}</span>`;
+    if (q && q.defId !== 'queen') boss = `<span class="plate__boss" data-tip-uid="${q.uid}">${escapeHtml(cardName(q.defId))}</span>`;
   }
   return `<div class="plate ${you ? 'plate--you' : 'plate--bot'} ${active ? 'active' : ''}">
       <span class="plate__who">${you ? t('battle.you') : t('battle.bot')}${boss}</span>
@@ -334,13 +423,15 @@ function renderShop(): string {
     const def = cardDef(item.defId);
     const afford = r.gold >= item.price;
     const abil = describeDef(def);
-    return `<div class="shopcard r-${def.rarity} ${item.sold ? 'sold' : ''}">
+    return `<div class="shopcard r-${def.rarity} ${item.sold ? 'sold' : ''}" data-tip-def="${def.id}">
         <div class="shopcard__head">
-          <span class="spr shopicon" style="background-image:url(${iconFor(def.id)})"></span>
-          <span class="shopcard__name">${escapeHtml(cardName(def.id))}</span>
-          <span class="shopcard__rar r-txt-${def.rarity}">${t('rar.' + def.rarity)}</span>
+          <span class="shopicon">${cardArt(def.id)}</span>
+          <span class="shopcard__title">
+            <span class="shopcard__name">${escapeHtml(cardName(def.id))}</span>
+            <span class="shopcard__rar r-txt-${def.rarity}">${t('rar.' + def.rarity)}</span>
+          </span>
         </div>
-        <div class="shopcard__stats"><span class="cost">⚡${def.cost}</span> <span class="atk">${def.attack}</span> <span class="hp">${def.hp}</span>${def.range > 1 ? ` <span class="rng">🏹${def.range}</span>` : ''}</div>
+        <div class="shopcard__stats"><span class="stat cost">⚡${def.cost}</span><span class="stat atkv">⚔${def.attack}</span><span class="stat hpv">❤${def.hp}</span>${def.range > 1 ? `<span class="stat rngv">🏹${def.range}</span>` : ''}</div>
         <div class="shopcard__abil">${abil ? escapeHtml(abil) : `<span class="muted">${t('shop.noAbility')}</span>`}</div>
         <button class="buy" data-action="buy" data-idx="${i}" ${item.sold || !afford ? 'disabled' : ''}>
           ${item.sold ? t('shop.bought') : `${t('shop.buy')} 🪙${item.price}`}
@@ -352,7 +443,7 @@ function renderShop(): string {
     const upBtn = d.level >= MAX_LEVEL
       ? `<span class="maxlvl">MAX</span>`
       : `<button class="mini up" data-action="upgrade" data-def="${d.defId}" ${canUpgrade(r, d.defId) ? '' : 'disabled'} title="${t('shop.upgrade')}">⬆🪙${upgradeCost(d.level)}</button>`;
-    return `<div class="deckrow">
+    return `<div class="deckrow" data-tip-def="${d.defId}">
         <span>${d.count}× <b>${escapeHtml(cardName(d.defId))}</b>${lvlTag} <span class="muted">⚡${d.cost}</span></span>
         <span class="deckrow__btns">${upBtn}<button class="mini" data-action="remove" data-def="${d.defId}" ${r.gold >= REMOVE_COST ? '' : 'disabled'} title="${t('shop.remove')}">−🪙${REMOVE_COST}</button></span>
       </div>`;
@@ -360,7 +451,7 @@ function renderShop(): string {
   const bossDef = cardDef(bossQueenFor(r.ante));
   const bossAbil = describeDef(bossDef);
   const isBoss = bossDef.id !== 'queen';
-  const bossNote = `<div class="bossnote ${isBoss ? 'boss' : ''}">
+  const bossNote = `<div class="bossnote ${isBoss ? 'boss' : ''}" data-tip-def="${bossDef.id}">
       ${isBoss ? '👑💀' : '👑'} ${t('shop.nextFoe')} · Ante ${r.ante}: <b>${escapeHtml(cardName(bossDef.id))}</b>${bossAbil ? ` — <span class="muted">${escapeHtml(bossAbil)}</span>` : ''}
     </div>`;
   return `${langBar(true)}
@@ -398,6 +489,7 @@ function renderEnd(): string {
 
 // ── ROUTER ──────────────────────────────────────────────────────────────────
 function render(): void {
+  hideTip(); // tooltip se váže na staré DOM uzly — po překreslení schovej
   let body: string;
   if (screen === 'menu') body = renderMenu();
   else if (!run) body = renderMenu();
@@ -538,9 +630,6 @@ function handleAction(action: string, el: HTMLElement): void {
 
 function escapeHtml(s: string): string {
   return s.replace(/[&<>]/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[ch] as string);
-}
-function escapeAttr(s: string): string {
-  return escapeHtml(s).replace(/"/g, '&quot;');
 }
 
 // nejdřív nařež pixel-art rámečky, pak vykresli
