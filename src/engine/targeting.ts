@@ -126,6 +126,16 @@ registerTarget('enemyQueen', (state, uid) => {
   return boardCards(state).filter((x) => x.owner === opponent(c.owner) && x.isQueen);
 });
 
+// Nejslabší nepřítel (nejnižší HP) na desce — pro popravy/odstřel.
+registerTarget('lowestHpEnemy', (state, uid) => {
+  const c = src(state, uid);
+  if (!c) return [];
+  const foes = boardCards(state).filter((x) => x.owner === opponent(c.owner));
+  if (foes.length === 0) return [];
+  foes.sort((a, b) => a.hp - b.hp || a.uid - b.uid);
+  return [foes[0]];
+});
+
 registerTarget('randomEnemy', (state, uid) => {
   const c = src(state, uid);
   if (!c) return [];

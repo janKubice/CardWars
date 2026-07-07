@@ -47,6 +47,7 @@ function targetText(a: AbilityDef): string {
     case 'allAllies': return t('tg.allAllies');
     case 'enemyQueen': return t('tg.enemyQueen');
     case 'randomEnemy': return t('tg.randomEnemy');
+    case 'lowestHpEnemy': return t('tg.lowestHpEnemy');
     case 'alliesTag': return t('tg.alliesTag', { tag: String(a.params?.tag ?? '') });
     default: return a.target;
   }

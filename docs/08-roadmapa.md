@@ -57,7 +57,7 @@ Cíl: **jeden hratelný souboj** na desce 7×6, žádná ekonomika, pevný balí
 - [x] Zpětná vazba UI: animace zásahů/výpadu/smrti, plovoucí čísla, sekvenční tah bota (hotovo v předchozích fázích).
 - [x] Combo motory: nový trigger **allyDeploy** („kdykoli vyložíš kartu") krmený energií — karty Dirigent (roste s vyložením) a Jiskřič (zásah za vyložení); **řetězení výbuchů** přes Explosive death-bombery (Zákopník/Granátník). Opraveny Skon-triggery (dříve se na padlé kartě nespouštěly). Test `npm run featcheck`.
 - [~] Chytřejší bot: obrana Královny + poziční pokládání + head-to-head test `npm run botcompare` (~74 % vs greedy). Zbývá mělké prohledávání a obtížnostní páky.
-- [ ] Dotáhnout pool ke 100+ kartám.
+- [x] Dotáhnout pool ke 100+ kartám: **103 kupitelných** (113 def celkem). Dva nové kmeny se synergiemi — **Beast** (Psovod/Pán zvířat/Zvířecí král buffnou zvířata, tokeny Vlk) a **Undead** (Nekromant/Lich/Nekrolord přivolávají Kostlivce). Nový cíl `lowestHpEnemy` (poprava). Validace poolu v `npm run featcheck` (jména CS+EN, platná přivolání).
 
 ---
 

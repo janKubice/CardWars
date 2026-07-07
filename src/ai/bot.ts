@@ -166,6 +166,15 @@ function scoreActivate(engine: GameEngine, me: PlayerId, uid: number): Move | nu
     if (val >= target.hp) score += cardValue(target);
     return { kind: 'activate', card: uid, target: target.uid, score };
   }
+  if (ab.effect === 'destroy') {
+    // tvrdé odstranění: nepřátelská Královna (= výhra) → nejcennější cíl
+    const queen = targets.find((t) => t.isQueen);
+    const target = queen ?? [...targets].sort((a, b) => cardValue(b) - cardValue(a))[0];
+    let score = cardValue(target) + 5;
+    if (target.isQueen) score += 100;
+    else if (isThreat(engine, me, target)) score += target.attack * 2 + 4;
+    return { kind: 'activate', card: uid, target: target.uid, score };
+  }
   if (ab.effect === 'heal') {
     const wounded = targets.filter((t) => t.hp < t.maxHp).sort((a, b) => (b.maxHp - b.hp) - (a.maxHp - a.hp));
     if (wounded.length === 0) return null;

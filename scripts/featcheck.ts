@@ -2,7 +2,8 @@
 // Spuštění: node --experimental-strip-types scripts/featcheck.ts
 
 import { GameEngine, EffectRunner, getEffect, getTarget, instantiate, placeOnGrid, recomputeAuras, drawCards } from '../src/engine/index.ts';
-import { LIBRARY } from '../src/content/cards.ts';
+import { CARD_DEFS, LIBRARY } from '../src/content/cards.ts';
+import { setLang, cardName } from '../src/i18n/index.ts';
 
 declare const process: { exit(code: number): never };
 
@@ -181,5 +182,28 @@ runner7.drain();
 check('řetězení: první výbuch zabije druhého bombera', gren.zone === 'dead');
 check('řetězení: druhý výbuch zasáhne vzdálenějšího nepřítele', chainFoe.zone === 'dead');
 
-console.log(failed === 0 ? '\nOK ✅ vše OK (aura, aktivace, efekty, recyklace, bossové, kombo, combo motory).' : `\nCHYBA: ${failed} kontrol selhalo.`);
+// ── VALIDACE POOLU: jména (CS+EN) a platné odkazy přivolání ──
+let missingName = 0;
+for (const lang of ['cs', 'en'] as const) {
+  setLang(lang);
+  for (const d of CARD_DEFS) {
+    if (cardName(d.id) === 'card.' + d.id) { console.log(`  chybí jméno [${lang}]: ${d.id}`); missingName++; }
+  }
+}
+setLang('cs');
+check(`pool: každá karta má jméno v CS i EN (${CARD_DEFS.length} karet)`, missingName === 0);
+
+let badSummon = 0;
+for (const d of CARD_DEFS) {
+  for (const ab of d.abilities ?? []) {
+    const ref = ab.params?.defId;
+    if (typeof ref === 'string' && !LIBRARY[ref]) { console.log(`  neplatné přivolání: ${d.id} → ${ref}`); badSummon++; }
+  }
+}
+check('pool: všechna přivolání (defId) míří na existující kartu', badSummon === 0);
+
+const buyable = CARD_DEFS.filter((d) => !d.isQueen && !(d.tags ?? []).includes('token'));
+check(`pool: 100+ kupitelných karet (aktuálně ${buyable.length})`, buyable.length >= 100);
+
+console.log(failed === 0 ? '\nOK ✅ vše OK (aura, aktivace, efekty, recyklace, bossové, kombo, combo motory, pool).' : `\nCHYBA: ${failed} kontrol selhalo.`);
 if (failed > 0) process.exit(1);
