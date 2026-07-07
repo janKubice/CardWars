@@ -158,6 +158,18 @@ button:disabled { opacity: .5; cursor: not-allowed; }
   font-size: 26px; line-height: 1; filter: drop-shadow(0 1px 1px rgba(0,0,0,.4));
 }
 .pc__abil { position: absolute; top: 5%; right: 9%; color: #c9971f; font-size: 10px; z-index: 2; }
+.pc__mk {
+  position: absolute; top: 3%; right: 4%; z-index: 2;
+  display: flex; flex-direction: column; align-items: flex-end; gap: 0;
+  font-size: 9px; line-height: 1.05;
+}
+.pc__mk span { filter: drop-shadow(0 1px 1px rgba(0,0,0,.7)); }
+.pc__name {
+  position: absolute; left: 4%; right: 4%; bottom: 18%; z-index: 2; pointer-events: none;
+  text-align: center; font-size: 8px; font-weight: 800; letter-spacing: .1px;
+  color: #fbeecb; text-shadow: 0 1px 2px #000, 0 0 3px #000;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
 .pc__foot {
   position: absolute; left: 6%; right: 6%; bottom: 7%;
   display: flex; justify-content: space-between; align-items: center; font-size: 9px;

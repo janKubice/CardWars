@@ -58,6 +58,23 @@ function cardArt(defId: string): string {
   return `<span class="artemoji">${CARD_ART[defId] ?? '❔'}</span>`;
 }
 
+// malé ikonky na kartě: kdy/co dělá (plný popis je v najížděcím tooltipu)
+const TRIG_GLYPH: Record<string, string> = {
+  deploy: '✦', allyDeploy: '🎴', death: '☠️', wound: '🩸', onHeal: '💚', onShield: '🔰',
+  attack: '⚔️', kill: '💀', upkeepStart: '☀️', upkeepEnd: '🌙', countdown: '⏳', aura: '✴️', active: '✨',
+};
+const KW_GLYPH: Record<string, string> = { charge: '🏃', fragile: '💔', thorns: '🌵', bloodthirst: '🧛' };
+/** Řádek ikonek keywordů + triggerů schopností v rohu karty. */
+function markers(c: CardInstance): string {
+  const g: string[] = [];
+  for (const k of c.keywords) if (KW_GLYPH[k]) g.push(KW_GLYPH[k]);
+  const seen = new Set<string>();
+  for (const a of c.abilities) {
+    if (TRIG_GLYPH[a.trigger] && !seen.has(a.trigger)) { seen.add(a.trigger); g.push(TRIG_GLYPH[a.trigger]); }
+  }
+  return g.length ? `<div class="pc__mk">${g.slice(0, 4).map((x) => `<span>${x}</span>`).join('')}</div>` : '';
+}
+
 // vrstva pro efekty (plovoucí čísla, záblesky) — přežívá překreslení #app
 const fx = document.createElement('div');
 fx.id = 'fx';
@@ -260,9 +277,10 @@ function pieceCard(c: CardInstance, extra: string): string {
   // jméno + celý popis je v najížděcím tooltipu; na desce jen art + staty
   return `<div class="${cls}" data-uid="${c.uid}" data-tip-uid="${c.uid}" ${bg}>
       ${c.isQueen ? '<span class="crown">♛</span>' : ''}
-      ${c.abilities.length ? '<span class="pc__abil">✦</span>' : ''}
+      ${markers(c)}
       <div class="pc__art">${cardArt(c.defId)}</div>
       ${badges(c)}
+      <div class="pc__name">${escapeHtml(cardName(c.defId))}</div>
       <div class="pc__foot"><span class="${atkCls}">${c.attack}</span><span class="hp">${Math.max(0, c.hp)}/${c.maxHp}</span></div>
     </div>`;
 }
