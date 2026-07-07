@@ -42,6 +42,7 @@ export interface EffectAPI {
   move(uid: number, pos: Position): void;
   bounce(uid: number): void;
   silence(uid: number): void;
+  energy(owner: PlayerId, amount: number): void;
   rngInt(n: number): number;
   log(code: string, params?: Record<string, string | number>): void;
 }
@@ -300,6 +301,10 @@ export class EffectRunner {
         c.keywords = [];
         c.counters = {};
         pushLog(state, 'silence', { card: c.defId });
+      },
+      energy(owner, amount) {
+        state.players[owner].energy = Math.max(0, state.players[owner].energy + amount);
+        pushLog(state, 'energy', { owner, n: amount });
       },
       rngInt(n) {
         return nextInt(state.rng, n);

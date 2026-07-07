@@ -113,10 +113,12 @@ const cs: Dict = {
   'ab.destroy': 'zničí', 'ab.terrain': 'rozmístí {t}', 'ab.discardRandom': 'zahodí nepříteli kartu z ruky',
   'ab.draw': 'dober {n}', 'ab.summon': 'přivolá jednotku',
   'ab.push': 'odstrčí', 'ab.pull': 'přitáhne', 'ab.bounce': 'vrátí do ruky', 'ab.silence': 'umlčí',
+  'ab.energy': '+{n} energie tento tah',
   // target templates
   'tg.self': 'sobě', 'tg.neighbor': 'sousedovi {dir}', 'tg.direction': '{dir}', 'tg.around': 'v okolí',
   'tg.aroundVictim': 'v okolí oběti', 'tg.lowestHpAlly': 'nejslabšímu spojenci', 'tg.allEnemies': 'všem nepřátelům',
   'tg.allAllies': 'všem spojencům', 'tg.enemyQueen': 'nepřátelské Královně', 'tg.randomEnemy': 'náhodnému nepříteli',
+  'tg.alliesTag': 'tvým {tag}',
   // log
   'log.shieldAbsorb': '🛡️ {card} pohltil štítem {n}', 'log.damage': '💥 {card} dostal {n}',
   'log.heal': '❤️ {card} vyléčen o {n}', 'log.destroy': '☠️ {card} zničen',
@@ -130,6 +132,7 @@ const cs: Dict = {
   'log.activate': '✨ {card} použil schopnost',
   'log.bounce': '↩️ {card} vrácen do ruky', 'log.silence': '🔇 {card} umlčen',
   'log.reshuffle': '🔀 {owner} zamíchal odhoz zpět do balíčku',
+  'log.energy': '⚡ {owner} získal {n} energie',
   // card names
   'card.queen': 'Královna', 'card.recruit': 'Rekrut', 'card.spearman': 'Kopiník', 'card.archer': 'Lučištník',
   'card.medic': 'Zdravotník', 'card.wall': 'Křeček-zeď', 'card.minelayer': 'Minér', 'card.reaper': 'Kosec',
@@ -144,6 +147,8 @@ const cs: Dict = {
   'card.swarmling': 'Roj', 'card.queen_swarm': 'Rojová královna', 'card.queen_thorn': 'Trnová královna',
   'card.queen_blood': 'Krvavá královna', 'card.queen_fire': 'Ohnivá královna', 'card.queen_war': 'Velící královna',
   'card.queen_titan': 'Titánská královna',
+  'card.ritualist': 'Ritualista', 'card.collector': 'Sběratel', 'card.catalyst': 'Katalyzátor',
+  'card.pyromaniac': 'Pyromaniak', 'card.grandmaster': 'Velmistr',
 };
 
 const en: Dict = {
@@ -199,9 +204,11 @@ const en: Dict = {
   'ab.destroy': 'destroys', 'ab.terrain': 'places {t}', 'ab.discardRandom': 'discards a random enemy card',
   'ab.draw': 'draw {n}', 'ab.summon': 'summons a unit',
   'ab.push': 'pushes', 'ab.pull': 'pulls', 'ab.bounce': 'returns to hand', 'ab.silence': 'silences',
+  'ab.energy': '+{n} energy this turn',
   'tg.self': 'self', 'tg.neighbor': 'neighbor {dir}', 'tg.direction': '{dir}', 'tg.around': 'around',
   'tg.aroundVictim': 'around the victim', 'tg.lowestHpAlly': 'weakest ally', 'tg.allEnemies': 'all enemies',
   'tg.allAllies': 'all allies', 'tg.enemyQueen': 'enemy Queen', 'tg.randomEnemy': 'a random enemy',
+  'tg.alliesTag': 'your {tag}',
   'log.shieldAbsorb': '🛡️ {card} absorbed {n} with shield', 'log.damage': '💥 {card} took {n}',
   'log.heal': '❤️ {card} healed {n}', 'log.destroy': '☠️ {card} destroyed',
   'log.queenFell': "👑 {owner}'s Queen fell — {winner} wins!", 'log.summon': '✨ {card} summoned',
@@ -214,6 +221,7 @@ const en: Dict = {
   'log.activate': '✨ {card} used its ability',
   'log.bounce': '↩️ {card} returned to hand', 'log.silence': '🔇 {card} silenced',
   'log.reshuffle': '🔀 {owner} shuffled discard back into deck',
+  'log.energy': '⚡ {owner} gained {n} energy',
   'card.queen': 'Queen', 'card.recruit': 'Recruit', 'card.spearman': 'Spearman', 'card.archer': 'Archer',
   'card.medic': 'Medic', 'card.wall': 'Wall Hamster', 'card.minelayer': 'Minelayer', 'card.reaper': 'Reaper',
   'card.protector': 'Protector', 'card.berserk': 'Berserker', 'card.courier': 'Courier', 'card.vengetree': 'Vengeful Tree',
@@ -227,6 +235,8 @@ const en: Dict = {
   'card.swarmling': 'Swarmling', 'card.queen_swarm': 'Swarm Queen', 'card.queen_thorn': 'Thorn Queen',
   'card.queen_blood': 'Blood Queen', 'card.queen_fire': 'Fire Queen', 'card.queen_war': 'War Queen',
   'card.queen_titan': 'Titan Queen',
+  'card.ritualist': 'Ritualist', 'card.collector': 'Collector', 'card.catalyst': 'Catalyst',
+  'card.pyromaniac': 'Pyromaniac', 'card.grandmaster': 'Grandmaster',
 };
 
 const STRINGS: Record<Lang, Dict> = { cs, en };

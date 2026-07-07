@@ -66,6 +66,13 @@ registerEffect('draw', (api, params, _targets, sourceUid) => {
   api.draw(c.owner, num(params, 'value', 'count'));
 });
 
+// Energie navíc tento tah (kombo — řetězení dalších vyložení).
+registerEffect('energy', (api, params, _targets, sourceUid) => {
+  const c = api.state.cards.get(sourceUid);
+  if (!c) return;
+  api.energy(c.owner, num(params, 'value', 'amount'));
+});
+
 // Odstrčení: posune cíl o 1 políčko směrem OD zdroje (pull = k zdroji).
 function shove(api: EffectAPI, targets: CardInstance[], sourceUid: number, toward: boolean): void {
   const src = api.state.cards.get(sourceUid);

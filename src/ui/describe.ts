@@ -29,6 +29,7 @@ function effectText(a: AbilityDef): string {
     case 'pull': return t('ab.pull');
     case 'bounce': return t('ab.bounce');
     case 'silence': return t('ab.silence');
+    case 'energy': return t('ab.energy', { n: n(p, 'value', 'amount') });
     default: return a.effect;
   }
 }
@@ -46,6 +47,7 @@ function targetText(a: AbilityDef): string {
     case 'allAllies': return t('tg.allAllies');
     case 'enemyQueen': return t('tg.enemyQueen');
     case 'randomEnemy': return t('tg.randomEnemy');
+    case 'alliesTag': return t('tg.alliesTag', { tag: String(a.params?.tag ?? '') });
     default: return a.target;
   }
 }

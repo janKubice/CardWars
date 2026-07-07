@@ -1,7 +1,7 @@
 // Deterministický test aury a aktivních schopností na úrovni enginu.
 // Spuštění: node --experimental-strip-types scripts/featcheck.ts
 
-import { GameEngine, EffectRunner, getEffect, instantiate, placeOnGrid, recomputeAuras, drawCards } from '../src/engine/index.ts';
+import { GameEngine, EffectRunner, getEffect, getTarget, instantiate, placeOnGrid, recomputeAuras, drawCards } from '../src/engine/index.ts';
 import { LIBRARY } from '../src/content/cards.ts';
 
 declare const process: { exit(code: number): never };
@@ -129,5 +129,28 @@ runner4.enqueue({ type: 'destroy', uid: victim2.uid });
 runner4.drain();
 check('krvežíznivost: boss se léčí za padlou nepřátelskou kartu', bloodQueen?.hp === 12);
 
-console.log(failed === 0 ? '\nOK ✅ vše OK (aura, aktivace, efekty, recyklace, bossové).' : `\nCHYBA: ${failed} kontrol selhalo.`);
+// ── KOMBO: energie navíc + tag synergie ──
+const e5 = new GameEngine({ library: LIBRARY, decks: { A: [], B: [] }, seed: 7 });
+const st5 = e5.state;
+st5.active = 'A';
+st5.players.A.energy = 1;
+const rit = instantiate(st5, 'ritualist', 'A', 'board');
+placeOnGrid(st5, rit.uid, { row: 3, col: 1 });
+const runnerE = new EffectRunner(st5);
+getEffect('energy')?.(runnerE.makeApi(rit.uid), { value: 2 }, [], rit.uid, undefined);
+runnerE.drain();
+check('kombo: efekt energy dá +2 energie tento tah', st5.players.A.energy === 3);
+
+const pyro = instantiate(st5, 'pyromaniac', 'A', 'board');
+placeOnGrid(st5, pyro.uid, { row: 3, col: 2 });
+const mlr = instantiate(st5, 'minelayer', 'A', 'board');
+placeOnGrid(st5, mlr.uid, { row: 3, col: 3 });
+const tagTargets = getTarget('alliesTag')?.(st5, pyro.uid, { tag: 'Explosive' }, undefined) ?? [];
+const mlrAtk = mlr.baseAttack;
+const runnerB = new EffectRunner(st5);
+getEffect('buff')?.(runnerB.makeApi(pyro.uid), { atk: 1, tag: 'Explosive' }, tagTargets, pyro.uid, undefined);
+runnerB.drain();
+check('kombo: tag synergie buffne Explosive spojence (+1 útok)', mlr.baseAttack === mlrAtk + 1);
+
+console.log(failed === 0 ? '\nOK ✅ vše OK (aura, aktivace, efekty, recyklace, bossové, kombo).' : `\nCHYBA: ${failed} kontrol selhalo.`);
 if (failed > 0) process.exit(1);

@@ -168,6 +168,31 @@ export const CARD_DEFS: CardDef[] = [
     abilities: [{ trigger: 'active', effect: 'damage', target: 'chosen', params: { value: 3, side: 'enemy', range: 5, cost: 2 } }],
   },
   { id: 'titan', name: 'Titán', rarity: 'legendary', cost: 8, hp: 10, attack: 6, range: 1, keywords: ['fragile', 'charge'] },
+
+  // ── Kombo / synergie (energie navíc = řetězení vyložení, tag synergie) ──
+  {
+    id: 'ritualist', name: 'Ritualista', rarity: 'uncommon', cost: 2, hp: 1, attack: 2, range: 1,
+    abilities: [{ trigger: 'deploy', effect: 'energy', target: 'none', params: { value: 2 } }],
+  },
+  {
+    id: 'collector', name: 'Sběratel', rarity: 'uncommon', cost: 2, hp: 1, attack: 2, range: 1,
+    abilities: [{ trigger: 'deploy', effect: 'draw', target: 'none', params: { value: 2 } }],
+  },
+  {
+    id: 'catalyst', name: 'Katalyzátor', rarity: 'rare', cost: 3, hp: 2, attack: 2, range: 1,
+    abilities: [
+      { trigger: 'deploy', effect: 'draw', target: 'none', params: { value: 1 } },
+      { trigger: 'deploy', effect: 'energy', target: 'none', params: { value: 1 } },
+    ],
+  },
+  {
+    id: 'pyromaniac', name: 'Pyromaniak', rarity: 'rare', cost: 3, hp: 2, attack: 2, range: 1, tags: ['Explosive'],
+    abilities: [{ trigger: 'deploy', effect: 'buff', target: 'alliesTag', params: { atk: 1, tag: 'Explosive' } }],
+  },
+  {
+    id: 'grandmaster', name: 'Velmistr', rarity: 'epic', cost: 4, hp: 3, attack: 3, range: 1,
+    abilities: [{ trigger: 'deploy', effect: 'energy', target: 'none', params: { value: 3 } }],
+  },
 ];
 
 export const LIBRARY: Record<string, CardDef> = Object.fromEntries(CARD_DEFS.map((d) => [d.id, d]));

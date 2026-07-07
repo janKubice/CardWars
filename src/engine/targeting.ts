@@ -112,6 +112,14 @@ registerTarget('allAllies', (state, uid) => {
   return boardCards(state).filter((x) => x.owner === c.owner);
 });
 
+// Spojenci se zadaným tagem (params.tag) — pro synergie (např. Explosive).
+registerTarget('alliesTag', (state, uid, params) => {
+  const c = src(state, uid);
+  if (!c) return [];
+  const tag = String(params.tag ?? '');
+  return boardCards(state).filter((x) => x.owner === c.owner && x.tags.includes(tag));
+});
+
 registerTarget('enemyQueen', (state, uid) => {
   const c = src(state, uid);
   if (!c) return [];
